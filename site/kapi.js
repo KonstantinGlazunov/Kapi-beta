@@ -218,7 +218,7 @@
       if (!entry.ready) return;
       const attachment = this.getAttachmentTransform(slot, pose, limbs);
       const bounds = {
-        hat: [-150, -239, 300, 140], glasses: [-181, -84, 362, 104],
+        hat: [-150, -239, 300, 140], glasses: [-180, -114, 380, 104],
         neck: [-122, -216, 245, 165], back: [-325, -170, 170, 220], badge: [82, -45, 85, 90]
       }[slot];
       context.save();
@@ -226,6 +226,8 @@
       context.rotate(slot === "hat" || slot === "glasses" ? limbs.head : 0);
       context.scale(slot === "hat" || slot === "glasses" ? .70 * limbs.headScaleX : .69,
         slot === "hat" || slot === "glasses" ? .70 * limbs.headScaleY : .69);
+      // The face is in three-quarter view: the far eye sits higher.
+      if (slot === "glasses") context.rotate(-.20);
       context.drawImage(entry.image, ...bounds);
       context.restore();
     }
@@ -704,7 +706,8 @@
       if (drawHead) {
         this.drawPart(context, headAsset, 350 + limbs.headX, 190 + limbs.headY, .70, limbs.head, 244, 215, limbs.headScaleX, limbs.headScaleY);
         this.drawCosmetic(context, "hat", outfit.hat, pose, limbs);
-        this.drawCosmetic(context, "glasses", outfit.glasses, pose, limbs);
+        // Dance artwork already includes star-shaped glasses.
+        if (headAsset !== "headDance") this.drawCosmetic(context, "glasses", outfit.glasses, pose, limbs);
       }
       context.restore();
     }
