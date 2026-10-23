@@ -31,3 +31,16 @@ Unchecking it selects a static result. Normal training retains OS preferences.
 Cache version: beta-20261023-result-preview-2.
 Verification: JS syntax and deterministic finale-timer regression check in V8.
 No real browser/screenshots/audio or installed-worker update check was available.
+
+## Visible result canvas restart — 2026-10-23
+
+User reports that the menu closes but Kapi stays still. Reproduced a separate
+canvas-size defect: endResultShow creates the result animator while its screen
+is hidden. Without a ResizeObserver callback, showing that already-running record
+leaves the canvas at 1x1. Pausing and resuming it after the result layout is visible
+changes its backing size to the measured dimensions (390x300 in the diagnostic).
+The preview now explicitly restarts after finishTraining and on the next frame.
+The normal training flow is unchanged. Startup errors reopen the menu and log
+the cause instead of leaving an error message inside a closed dialog.
+DEMO 3 identifies the page revision; cache beta-20261023-result-preview-3.
+Actual phone rendering is still unverified in this session.

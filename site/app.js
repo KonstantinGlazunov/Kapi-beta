@@ -2848,7 +2848,7 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 3</small>
       <p id="previewHelp">Поздравление → подарок → итог. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
@@ -2930,11 +2930,22 @@ function makePowerProblem(max, mastered) {
         document.body.classList.add("preview-playing");
         dialog.close();
         finishTraining(); // The real beta finale, including its sounds and timers.
+        // endResultShow() can create this canvas while its section is hidden (1x1).
+        // Restart only after the dialog is closed and the result layout is visible.
+        const restartCanvas = () => {
+          if (!$("resultScreen").classList.contains("active")) return;
+          kapi.animator.pause("result");
+          kapi.animator.setSurface("result");
+        };
+        restartCanvas();
+        window.requestAnimationFrame(restartCanvas);
         $("againButton").textContent = ru ? "Посмотреть ещё раз" : "Noch einmal ansehen";
         $("settingsButton").textContent = "☰";
         $("settingsButton").setAttribute("aria-label", ru ? "Настройки просмотра" : "Vorschau einstellen");
         $("previewStatus").textContent = "";
-      } catch {
+      } catch (error) {
+        console.error("Kapi result preview:", error);
+        if (!dialog.open) dialog.showModal();
         $("previewStatus").textContent = ru
           ? "Не удалось загрузить Капи. Проверьте интернет и попробуйте ещё раз."
           : "Kapi konnte nicht geladen werden. Bitte Verbindung prüfen und erneut versuchen.";
