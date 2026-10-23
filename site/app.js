@@ -5,6 +5,9 @@
   // This separate preview never reads or writes the learner's browser storage.
   const resultPreview = window.location.pathname.endsWith("/result-preview.html") ||
     new URLSearchParams(window.location.search).get("resultPreview") === "1";
+  let previewFullMotion = false;
+  const reduceResultMotion = () => resultPreview ? !previewFullMotion :
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
   const previewMemory = resultPreview ? new Map() : null;
   const previewStorage = resultPreview ? {
     getItem: (key) => previewMemory.get(key) ?? null,
@@ -2202,7 +2205,7 @@ function makePowerProblem(max, mastered) {
         : weeklyGoalComplete ? copy.weeklyDone : ru ? "Ближе к подарку!" : "Dem Geschenk näher!";
     }, 2600);
     resultShowTimer = window.setTimeout(endResultShow, 7000);
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) endResultShow();
+    if (reduceResultMotion()) endResultShow();
   }
 
   function saveSession(session) {
@@ -2315,7 +2318,7 @@ function makePowerProblem(max, mastered) {
   }
 
   function makeConfetti(count = 28) {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) {
+    if (reduceResultMotion()) {
       $("confetti").innerHTML = "";
       return;
     }
@@ -2855,6 +2858,7 @@ function makePowerProblem(max, mastered) {
           <option value="perfect">Без ошибок</option>
           <option value="regular">Обычное завершение</option>
         </select></label>
+      <label class="preview-sound"><input id="previewMotion" type="checkbox" checked><span id="previewMotionLabel">Полная анимация · 7 секунд</span></label>
       <label class="preview-sound"><input id="previewSound" type="checkbox" checked><span id="previewSoundLabel">Со звуком</span></label>
       <button id="previewPlay" class="primary-button" type="button">▶ Смотреть</button>
       <p id="previewStatus" role="status" aria-live="polite"></p>`;
@@ -2874,6 +2878,7 @@ function makePowerProblem(max, mastered) {
         option.textContent = (ru ? ["С новым подарком", "Без ошибок", "Обычное завершение"]
           : ["Mit neuem Geschenk", "Fehlerfreie Runde", "Normaler Abschluss"])[index];
       });
+      $("previewMotionLabel").textContent = ru ? "Полная анимация · 7 секунд" : "Volle Animation · 7 Sekunden";
       $("previewSoundLabel").textContent = ru ? "Со звуком" : "Mit Ton";
       playButton.textContent = ru ? "▶ Смотреть" : "▶ Abspielen";
     };
@@ -2896,6 +2901,9 @@ function makePowerProblem(max, mastered) {
           new Promise((_, reject) => window.setTimeout(() => reject(new Error("Asset timeout")), 15000))
         ]);
         endResultShow();
+        previewFullMotion = $("previewMotion").checked;
+        kapi.animator.reducedMotion = !previewFullMotion;
+        document.body.classList.toggle("preview-full-motion", previewFullMotion);
         motivation.resetSession();
         previewMemory.clear();
         storage.setItem(SETTINGS_KEY, JSON.stringify({

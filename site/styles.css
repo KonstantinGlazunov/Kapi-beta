@@ -1426,3 +1426,21 @@ body.game-active .game-status { display: none; }
 }
 .result-gift-box span::before { left: 36px; transform: rotate(20deg); }
 .result-gift-box span::after { right: 36px; transform: rotate(70deg); }
+
+/* A user-selected full-motion demo may override the device preference here only.
+   Normal beta training continues to respect reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  body.result-preview.preview-full-motion .result-screen .result-grid,
+  body.result-preview.preview-full-motion .result-screen .result-grid > div:nth-child(3),
+  body.result-preview.preview-full-motion .result-screen #resultRewardGoal,
+  body.result-preview.preview-full-motion .result-screen .result-gift-box,
+  body.result-preview.preview-full-motion .result-screen .result-show-progress {
+    animation: result-arrive .45s ease both !important;
+  }
+  body.result-preview.preview-full-motion .result-screen .result-gift-box span {
+    animation: gift-open .7s .2s both !important;
+  }
+  body.result-preview.preview-full-motion .result-screen .confetti-piece {
+    animation: confetti-fall 2.7s linear 1 both !important;
+  }
+}

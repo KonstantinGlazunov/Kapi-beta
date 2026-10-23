@@ -20,3 +20,14 @@ mobile layout and existing-PWA update tests could not be run because no executio
 workspace/browser was available. No visual-quality score is claimed.
 Next step: inspect the deployed preview on a phone, especially celebration, gift,
 summary, replay and audio. This page has not been promoted to production Kapi.
+
+## Full motion selection — 2026-10-23
+
+The 7-second timeline previously ended immediately when the device reported
+prefers-reduced-motion. The preview now offers an explicit full-animation
+checkbox (7 seconds). Play applies that choice to both the result timeline and
+the Canvas animator; CSS effects are enabled only in the opted-in preview.
+Unchecking it selects a static result. Normal training retains OS preferences.
+Cache version: beta-20261023-result-preview-2.
+Verification: JS syntax and deterministic finale-timer regression check in V8.
+No real browser/screenshots/audio or installed-worker update check was available.
