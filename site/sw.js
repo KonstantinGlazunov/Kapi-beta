@@ -1,9 +1,9 @@
 /* kapi-runtime:v1 — scope-derived URLs and private caches; consumed by /kapi proxy. */
 const CACHE_PREFIX = `kapi:${self.registration.scope}:`;
-const CACHE = `${CACHE_PREFIX}beta-20261021-184959-f5052a`;
+const CACHE = `${CACHE_PREFIX}beta-20261023-result-preview-1`;
 const SCOPE = new URL(self.registration.scope);
 const LEGACY_PREFIX = SCOPE.pathname === "/kapi/" ? "vibe-kapi-capy-count-beta-" : "capy-count-beta-";
-const ASSETS = ["./", "index.html", "styles.css", "kapi.js", "app.js", "manifest.webmanifest", "manifest-ru.webmanifest", "manifest-de.webmanifest", "favicon.svg", "icon-192.png", "icon-512.png", "assets/capybara.webp", "assets/kapi-welcome-sprite.webp", "assets/kapi-flag.webp", "assets/kapi-party.webp", "assets/kapi-dance.webp", "assets/kapi-handshake.webp", "assets/kapi-rig-v2/head.png", "assets/kapi-rig-v2/torso.png", "assets/kapi-rig-v4/arm-left-upper.png", "assets/kapi-rig-v4/arm-left-forearm.png", "assets/kapi-rig-v3/paw-left.png", "assets/kapi-rig-v4/arm-right-upper.png", "assets/kapi-rig-v4/arm-right-forearm.png", "assets/kapi-rig-v3/paw-right.png", "assets/kapi-rig-v3/leg-left.png", "assets/kapi-rig-v3/leg-right.png", "assets/kapi-rig-v3/foot-left.png", "assets/kapi-rig-v3/foot-right.png"];
+const ASSETS = ["result-preview.html", "./", "index.html", "styles.css", "kapi.js", "app.js", "manifest.webmanifest", "manifest-ru.webmanifest", "manifest-de.webmanifest", "favicon.svg", "icon-192.png", "icon-512.png", "assets/capybara.webp", "assets/kapi-welcome-sprite.webp", "assets/kapi-flag.webp", "assets/kapi-party.webp", "assets/kapi-dance.webp", "assets/kapi-handshake.webp", "assets/kapi-rig-v2/head.png", "assets/kapi-rig-v2/torso.png", "assets/kapi-rig-v4/arm-left-upper.png", "assets/kapi-rig-v4/arm-left-forearm.png", "assets/kapi-rig-v3/paw-left.png", "assets/kapi-rig-v4/arm-right-upper.png", "assets/kapi-rig-v4/arm-right-forearm.png", "assets/kapi-rig-v3/paw-right.png", "assets/kapi-rig-v3/leg-left.png", "assets/kapi-rig-v3/leg-right.png", "assets/kapi-rig-v3/foot-left.png", "assets/kapi-rig-v3/foot-right.png"];
 
 ASSETS.push("kapi-sound.js", "kapi-motivation.js", "assets/kapi-rig-v2/head-nod.png", "assets/kapi-rig-v2/head-hop.png", "assets/kapi-rig-v2/head-cheer.png", "assets/kapi-rig-v2/head-wrong.png", "assets/kapi-rig-v2/head-recovered.png", "assets/kapi-rig-v2/head-mastered.png", "assets/kapi-rig-v2/head-flag.png", "assets/kapi-rig-v2/head-horn-v2.png", "assets/kapi-rig-v2/arm-right-flag.png", "assets/kapi-rig-v2/head-dance.png", "assets/kapi-rig-v2/head-level.png", "assets/kapi-rig-v2/head-complete.png", "assets/kapi-rig-v2/head-perfect.png");
 ASSETS.push("kapi-rewards.js", ...["star-badge", "red-cap", "glasses", "scarf", "backpack", "blue-cap", "medal", "crown"].map((name) => `assets/cosmetics/${name}.svg`));
@@ -55,7 +55,10 @@ self.addEventListener("fetch", (event) => {
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     // Install links and navigations may contain query parameters; never cache visitor data.
-    if (event.request.mode === "navigate") return cache.match(new URL("index.html", SCOPE).href);
+    if (event.request.mode === "navigate") {
+      const page = url.pathname === new URL("result-preview.html", SCOPE).pathname ? "result-preview.html" : "index.html";
+      return cache.match(new URL(page, SCOPE).href);
+    }
     const cached = await cache.match(event.request, { ignoreSearch: true });
     if (cached) return cached;
     return fetch(event.request);

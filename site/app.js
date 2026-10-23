@@ -2,7 +2,16 @@
 (() => {
   "use strict";
 
-  const storage = window.KapiStorage.create(() => window.localStorage, () => {
+  // This separate preview never reads or writes the learner's browser storage.
+  const resultPreview = window.location.pathname.endsWith("/result-preview.html") ||
+    new URLSearchParams(window.location.search).get("resultPreview") === "1";
+  const previewMemory = resultPreview ? new Map() : null;
+  const previewStorage = resultPreview ? {
+    getItem: (key) => previewMemory.get(key) ?? null,
+    setItem: (key, value) => previewMemory.set(key, String(value)),
+    removeItem: (key) => previewMemory.delete(key)
+  } : null;
+  const storage = window.KapiStorage.create(() => resultPreview ? previewStorage : window.localStorage, () => {
     const notice = document.getElementById("storageNotice");
     if (notice) { notice.hidden = false; notice.textContent = copy.storageWarning; }
   });
@@ -2814,6 +2823,135 @@ function makePowerProblem(max, mastered) {
     window.__kapiDemo = { play, reset, getOutfit: () => demoMotivation.getOutfit() };
   }
 
+
+  function setupResultPreview() {
+    document.body.classList.add("result-preview");
+    const style = document.createElement("style");
+    style.textContent = `
+      body.result-preview:not(.preview-playing) .app-shell { visibility: hidden; }
+      .preview-dialog { width: min(440px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 24px; border: 0; border-radius: 24px; background: #fffdf4; color: #17312f; }
+      .preview-dialog::backdrop { background: #e8f5f0; }
+      .preview-dialog h1 { margin: 8px 0 12px; font-size: 1.65rem; line-height: 1.2; }
+      .preview-dialog p { line-height: 1.5; }
+      .preview-dialog label { display: block; margin: 16px 0; font-weight: 700; }
+      .preview-dialog select { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 8px; font: inherit; background: white; border: 1px solid #779d94; border-radius: 10px; }
+      .preview-dialog .preview-sound { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+      .preview-dialog input { width: 22px; height: 22px; }
+      .preview-dialog button { width: 100%; min-height: 48px; }
+      .preview-dialog [role=status] { font-size: .9rem; }
+    `;
+    document.head.appendChild(style);
+    const dialog = document.createElement("dialog");
+    dialog.className = "preview-dialog";
+    dialog.setAttribute("aria-labelledby", "previewTitle");
+    dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
+      <h1 id="previewTitle">Финал тренировки</h1>
+      <p id="previewHelp">Поздравление → подарок → итог. Без решения заданий. Учебный прогресс не меняется.</p>
+      <label id="previewLanguageLabel">Язык / Sprache
+        <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
+      <label><span id="previewScenarioLabel">Сценарий</span>
+        <select id="previewScenario">
+          <option value="gift">С новым подарком</option>
+          <option value="perfect">Без ошибок</option>
+          <option value="regular">Обычное завершение</option>
+        </select></label>
+      <label class="preview-sound"><input id="previewSound" type="checkbox" checked><span id="previewSoundLabel">Со звуком</span></label>
+      <button id="previewPlay" class="primary-button" type="button">▶ Смотреть</button>
+      <p id="previewStatus" role="status" aria-live="polite"></p>`;
+    document.body.appendChild(dialog);
+    const languageInput = $("previewLanguage");
+    const scenarioInput = $("previewScenario");
+    const playButton = $("previewPlay");
+    let playing = false;
+    const labels = () => {
+      const ru = languageInput.value === "ru";
+      $("previewTitle").textContent = ru ? "Финал тренировки" : "Trainingsabschluss";
+      $("previewHelp").textContent = ru
+        ? "Поздравление → подарок → итог. Без решения заданий. Учебный прогресс не меняется."
+        : "Feiern → Geschenk → Ergebnis. Ohne Aufgaben. Ihr Lernfortschritt bleibt unverändert.";
+      $("previewScenarioLabel").textContent = ru ? "Сценарий" : "Variante";
+      [...scenarioInput.options].forEach((option, index) => {
+        option.textContent = (ru ? ["С новым подарком", "Без ошибок", "Обычное завершение"]
+          : ["Mit neuem Geschenk", "Fehlerfreie Runde", "Normaler Abschluss"])[index];
+      });
+      $("previewSoundLabel").textContent = ru ? "Со звуком" : "Mit Ton";
+      playButton.textContent = ru ? "▶ Смотреть" : "▶ Abspielen";
+    };
+    languageInput.addEventListener("change", labels);
+    const openControls = () => {
+      endResultShow();
+      if (!dialog.open) dialog.showModal();
+    };
+    const play = async () => {
+      if (playing) return;
+      playing = true;
+      playButton.disabled = true;
+      const ru = languageInput.value === "ru";
+      $("previewStatus").textContent = ru ? "Загружаем Капи…" : "Kapi wird geladen…";
+      // Unlock on the user's tap, before awaiting image downloads.
+      soundManager.unlock();
+      try {
+        await Promise.race([
+          Promise.all([...kapi.animator.images.values()].map((entry) => entry.promise)),
+          new Promise((_, reject) => window.setTimeout(() => reject(new Error("Asset timeout")), 15000))
+        ]);
+        endResultShow();
+        motivation.resetSession();
+        previewMemory.clear();
+        storage.setItem(SETTINGS_KEY, JSON.stringify({
+          ...appSettings, language: languageInput.value, sound: $("previewSound").checked
+        }));
+        loadSettings();
+        applyLanguage();
+        const profile = getProfile();
+        profile.totalXp = scenarioInput.value === "gift" ? 15 : 100;
+        profile.currentStage = 1;
+        saveProfile(profile);
+        const perfect = scenarioInput.value === "perfect";
+        TOTAL = 20;
+        Object.assign(state, {
+          index: TOTAL, score: perfect ? 30 : 25, correct: perfect ? TOTAL : 18,
+          stage: 1, trainingStartStage: 1, trainingStartedCompleted: false,
+          stageAdvancedDuringSession: false, finalMotivationEvents: [],
+          sessionId: "preview-" + Date.now(), finished: false, targeted: null,
+          results: Array.from({ length: TOTAL }, (_, index) => ({
+            firstTry: perfect || index < 18, seconds: 4, taskType: "equation", key: "preview-" + index
+          }))
+        });
+        $("correctLabel").textContent = copy.correctOfTotal(TOTAL);
+        document.body.classList.add("preview-playing");
+        dialog.close();
+        finishTraining(); // The real beta finale, including its sounds and timers.
+        $("againButton").textContent = ru ? "Посмотреть ещё раз" : "Noch einmal ansehen";
+        $("settingsButton").textContent = "☰";
+        $("settingsButton").setAttribute("aria-label", ru ? "Настройки просмотра" : "Vorschau einstellen");
+        $("previewStatus").textContent = "";
+      } catch {
+        $("previewStatus").textContent = ru
+          ? "Не удалось загрузить Капи. Проверьте интернет и попробуйте ещё раз."
+          : "Kapi konnte nicht geladen werden. Bitte Verbindung prüfen und erneut versuchen.";
+      } finally {
+        playing = false;
+        playButton.disabled = false;
+      }
+    };
+    playButton.addEventListener("click", play);
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest?.("button");
+      if (!button) return;
+      if (button.id === "againButton") {
+        event.preventDefault(); event.stopImmediatePropagation(); play();
+      } else if (["settingsButton", "homeButton", "shareButton", "resultStatsButton"].includes(button.id)) {
+        event.preventDefault(); event.stopImmediatePropagation(); openControls();
+      }
+    }, true);
+    dialog.addEventListener("cancel", (event) => {
+      if (!document.body.classList.contains("preview-playing")) event.preventDefault();
+    });
+    labels();
+    dialog.showModal();
+  }
+
   $("startButton").addEventListener("click", () => startTrainingWithIntro());
   $("homeMascot").addEventListener("click", playHomeReaction);
   document.querySelector(".app-shell").addEventListener("pointerdown", (event) => {
@@ -2927,10 +3065,10 @@ function makePowerProblem(max, mastered) {
   if (runsStandalone()) storage.setItem(INSTALLED_KEY, "1");
   updateInstallHomeButton();
   document.body.classList.add("start-active");
-  if (isIosBrowser() && !runsStandalone()) showInstallPrompt("ios");
-  registerWebMcp();
+  if (!resultPreview && isIosBrowser() && !runsStandalone()) showInstallPrompt("ios");
+  if (!resultPreview) registerWebMcp();
   syncViewportSize();
-  if (!window.__kapiDemo) window.setTimeout(() => {
+  if (!resultPreview && !window.__kapiDemo) window.setTimeout(() => {
     if ($("startScreen").classList.contains("active")) restartHomeGreeting();
   }, 360);
   window.addEventListener("resize", syncViewportSize, { passive: true });
@@ -2939,5 +3077,6 @@ function makePowerProblem(max, mastered) {
   });
   window.visualViewport?.addEventListener("resize", syncViewportSize, { passive: true });
   window.visualViewport?.addEventListener("scroll", syncViewportSize, { passive: true });
-  registerServiceWorker();
+  if (resultPreview) setupResultPreview();
+  else registerServiceWorker();
 })();
