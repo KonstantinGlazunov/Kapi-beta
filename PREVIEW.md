@@ -44,3 +44,21 @@ The normal training flow is unchanged. Startup errors reopen the menu and log
 the cause instead of leaving an error message inside a closed dialog.
 DEMO 3 identifies the page revision; cache beta-20261023-result-preview-3.
 Actual phone rendering is still unverified in this session.
+
+## DEMO 5 — result composition, 2026-10-25
+
+Preserves the DEMO 4 ankle attachment and foot-behind-shin layering from
+`b5c608d`. The present now reserves space beneath Kapi, and its lid opens to
+the right and down. Confetti starts at different heights with individual
+negative delays, durations, drift and rotation; the full-motion override keeps
+those values under OS reduced motion. Explicit static preview stays static.
+Cache version: `beta-20261025-result-preview-5`.
+
+Local Chromium validation: celebration, gift and summary captured at 390x844
+and 320x568; inspected the gift composition. Browser regression checks cover
+both motion preferences, distinct delays and vertical particle spread, lid
+clearance, skip to summary, static preview, and page errors. Evidence and
+executable checks: `/workspace/artifacts/beta-result/` outside this checkout.
+JavaScript syntax and whitespace checks pass. Short screens still use the
+existing smaller gift-phase mascot. Real iOS installation is unverified.
+The user authorized publishing this correction to beta.
