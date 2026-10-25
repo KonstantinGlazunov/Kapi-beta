@@ -1422,3 +1422,50 @@ body.game-active .game-status { display: none; }
   }
 
 }
+
+/* The gift has its own stage; Kapi enters only after the gift has emerged. */
+.result-gift-stage { display: none; }
+.result-screen[data-show-phase="gift"] .result-gift-stage {
+  display: block; position: relative; flex: 1 1 auto; min-height: 250px; order: 2;
+}
+.result-screen[data-show-phase="gift"] :is(.result-mascot, #resultRewardGoal) { display: none; }
+.result-screen[data-show-phase="celebrate"] .result-grid { display: none; }
+.result-screen[data-show-phase="celebrate"] #resultRewardGoal { display: block; order: 4; margin: 12px 0 0; }
+.result-screen[data-show-phase="celebrate"] .result-show-progress { display: none; }
+.gift-ground-shadow {
+  position: absolute; left: 50%; top: calc(60% + 108px); width: 178px; height: 18px;
+  transform: translateX(-50%); border-radius: 50%; background: #215b4525; filter: blur(9px);
+}
+.gift-box-body {
+  position: absolute; z-index: 3; left: 50%; top: 60%; width: 154px; height: 110px;
+  transform: translateX(-50%); border-radius: 4px 4px 15px 15px;
+  background: linear-gradient(90deg, #13988e 0 39%, #ffda69 39% 61%, #0b807a 61%);
+  box-shadow: inset 0 7px 0 #07554b70, 0 9px 18px #0c6e5d19;
+}
+.gift-box-body > span { position: absolute; inset: -8px 0 auto; height: 12px; border-radius: 50%; background: #075950; z-index: -1; }
+.gift-box-lid {
+  position: absolute; z-index: 4; left: 50%; top: calc(60% - 18px); width: 174px; height: 27px;
+  transform: translateX(-50%); border-radius: 5px; transform-origin: 24% 70%;
+  background: linear-gradient(90deg, #25b9aa 0 40%, #ffe38c 40% 60%, #18a398 60%);
+  box-shadow: 0 5px 8px #174e3926;
+}
+.gift-box-lid > i, .gift-box-lid > b {
+  position: absolute; bottom: 21px; width: 43px; height: 29px; border: 7px solid #ffd467;
+  border-radius: 65% 65% 25% 65%;
+}
+.gift-box-lid > i { right: 50%; transform: rotate(24deg); transform-origin: right bottom; }
+.gift-box-lid > b { left: 50%; transform: rotate(-24deg); transform-origin: left bottom; border-radius: 65% 65% 65% 25%; }
+.gift-rise-window { position: absolute; z-index: 2; inset: 0; clip-path: inset(0 0 40% 0); }
+.gift-item {
+  position: absolute; left: 50%; top: 60%; width: 94px; height: 94px; object-fit: contain;
+  transform: translate(-50%, 22px) scale(.48); filter: drop-shadow(0 6px 5px #bc842433); opacity: 0;
+}
+.gift-aura {
+  position: absolute; z-index: 1; left: 50%; top: calc(60% - 45px); width: 250px; height: 250px;
+  transform: translate(-50%, -50%); border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, #ffe993aa, #fff3b044 45%, transparent 70%);
+}
+@media (max-height: 650px) {
+  .result-screen[data-show-phase="gift"] .result-card { min-height: 420px; padding-top: 38px; }
+  .result-screen[data-show-phase="gift"] .result-show-title { font-size: 1.5rem; }
+}

@@ -87,3 +87,45 @@ checks pass. Public browser TLS trust is unavailable in this environment;
 published bytes are checked using verified HTTPS instead. Real iOS remains
 unverified. An already installed beta worker can retain an older preview;
 a private browser tab provides a separate session without deleting progress.
+
+## DEMO 8 — continuous legs and gift before dance, 2026-10-25
+
+Supersedes the DEMO 6 no-box presentation, following the user's revised direction.
+The intermediate DEMO 7 continuous-leg work was validated locally and is included
+in this release, rather than published separately.
+
+- New transparent `site/assets/kapi-rig-v5/leg-and-paw.png`: one continuous
+  hip-to-toes sprite, with a gradual golden-fur-to-brown-toe transition. Both legs
+  use it, mirrored on the right. Removed independent ankle rotation, separate
+  foot rendering and foot-collar clipping; each entire limb rotates at the hip.
+- For a newly earned reward, Kapi is hidden while the closed box is shown.
+  Anticipation starts at 400ms; the lid lifts and drifts aside, fading clear of
+  the reward. At 1050ms the actual earned cosmetic starts rising from inside,
+  clipped by the box rim. It grows as it emerges, slows at its apex, slightly
+  overshoots, then settles. The gift stage fades at 3180–3400ms.
+- At 3400ms the newly earned item is equipped and Kapi appears dancing with
+  radial salute particles. Summary arrives at 7800ms. A round without a new
+  reward goes directly to a 4400ms dance. Static mode goes directly to summary.
+- Skip and replay cancel pending gift animations and timers. Reward, learning
+  progress, RU/DE localization and offline storage behavior are retained.
+- Preview: DEMO 8 · ПОДАРОК → ТАНЕЦ; cache/beta-version:
+  `20261025-result-preview-8`. New sprite is included in the worker precache.
+
+Validation: Node syntax and whitespace checks; inspected browser screenshots
+at 390x844 and 320x568 of closed box, lid opening, emergence, flight, hover,
+early/late dance, and summary. Browser assertions confirm Kapi stays hidden
+through the gift, the reward fully emerges above the rim, then the box disappears
+and Kapi enters looping trainingFinished dance. Skip prevents the pending dance;
+replay restarts the gift; no-reward German scenario and explicit static mode
+work. Offline install precaches the new limb and the entire gift-to-dance flow
+runs without network or page errors. Evidence/scripts retained outside checkout:
+`/workspace/artifacts/beta-result/` (`gift-flow.cjs`, `demo8-*`, `demo7-*-feet.png`).
+
+Use the checked public preview URL with a double slash immediately after the
+hostname: https://konstantinglazunov.github.io//Kapi-beta/result-preview.html?demo=8
+GitHub Pages serves this URL and its relative assets without redirects. An old
+worker scoped to `/Kapi-beta/` cannot control `//Kapi-beta/`; this was reproduced
+with an installed DEMO 3 worker and verified by screenshots, without deleting
+learning data. Public bytes are checked over verified HTTPS; live Chromium TLS
+trust remains unavailable, so rendering checks use matching local files.
+The user authorized immediate beta publication for review.

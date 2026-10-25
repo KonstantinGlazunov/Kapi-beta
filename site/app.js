@@ -300,9 +300,12 @@
   let rewardGoalTimer = 0;
   let resultShowTimer = 0;
   let resultPhaseTimer = 0;
+  let resultGiftAnimations = [];
   let revealResultReward = null;
 
   function endResultShow() {
+    resultGiftAnimations.forEach((animation) => animation.cancel());
+    resultGiftAnimations = [];
     window.clearTimeout(resultShowTimer);
     window.clearTimeout(resultPhaseTimer);
     window.clearTimeout(rewardRevealTimer);
@@ -2157,9 +2160,8 @@ function makePowerProblem(max, mastered) {
     $("rewardReveal").innerHTML = "";
     $("progressFill").style.width = "100%";
     showScreen($("resultScreen"));
-    const events = [...(state.finalMotivationEvents || []), { type: "trainingComplete", total: TOTAL }];
-    if (perfect) events.push({ type: "perfectTraining", total: TOTAL });
-    motivation.handle(events, { batchId: "completion", surface: "result" });
+    dismissMotivation();
+    kapi.reset("result", "idle");
     let rewardRevealed = false;
     if (unlocked.length || weeklyGoalComplete) {
       revealResultReward = (animate = true) => {
@@ -2186,26 +2188,68 @@ function makePowerProblem(max, mastered) {
           }
         }, 1600);
       };
-      rewardRevealTimer = window.setTimeout(() => revealResultReward?.(), perfect ? 2500 : TOTAL === 30 ? 2400 : 2000);
     }
     state.finalMotivationEvents = [];
-    makeConfetti(perfect ? 36 : TOTAL === 10 ? 16 : 28);
     const ru = language === "ru";
     const hasGift = unlocked.length > 0;
     $("skipResultShow").textContent = ru ? "Пропустить" : "Überspringen";
     $("skipResultShow").classList.remove("hidden");
     $("resultShowProgress").textContent = `${ru ? "Шаг вперёд" : "Ein Schritt weiter"} · ${copy.homeStage(state.stage)}`;
     $("resultScreen").dataset.hasGift = String(hasGift);
-    $("resultScreen").dataset.showPhase = "celebrate";
-    $("resultShowTitle").textContent = perfect ? copy.perfectTitle : ru ? "Ты справился!" : "Geschafft!";
-    resultPhaseTimer = window.setTimeout(() => {
+    const celebrate = () => {
+      $("resultScreen").dataset.showPhase = "celebrate";
+      $("resultShowTitle").textContent = perfect ? copy.perfectTitle : ru ? "Капи празднует!" : "Kapi feiert!";
+      revealResultReward?.(false);
+      kapi.reset("result", "trainingFinished");
+      soundManager.play("dance");
+      makeConfetti(perfect ? 36 : 28);
+    };
+    if (reduceResultMotion()) {
+      endResultShow();
+      return;
+    }
+    if (hasGift) {
       $("resultScreen").dataset.showPhase = "gift";
-      $("resultShowTitle").textContent = hasGift
-        ? ru ? "Подарок для Капи!" : "Ein Geschenk für Kapi!"
-        : weeklyGoalComplete ? copy.weeklyDone : ru ? "Ближе к подарку!" : "Dem Geschenk näher!";
-    }, 2600);
-    resultShowTimer = window.setTimeout(endResultShow, 7000);
-    if (reduceResultMotion()) endResultShow();
+      $("resultShowTitle").textContent = ru ? "Ты заслужил подарок!" : "Ein Geschenk für dich!";
+      const reward = rewards.getRewards().find((item) => item.id === unlocked[0].rewardId);
+      playGiftPresentation(reward);
+      resultPhaseTimer = window.setTimeout(celebrate, 3400);
+    } else celebrate();
+    resultShowTimer = window.setTimeout(endResultShow, hasGift ? 7800 : 4400);
+  }
+
+  function playGiftPresentation(reward) {
+    resultGiftAnimations.forEach((animation) => animation.cancel());
+    resultGiftAnimations = [];
+    const stage = $("resultGiftStage");
+    $("resultGiftItem").src = `assets/cosmetics/${reward.asset}.svg`;
+    const animate = (element, frames, timing) => {
+      const animation = element.animate(frames, { fill: "both", ...timing });
+      resultGiftAnimations.push(animation);
+      return animation;
+    };
+    // A short anticipation, a hinge-like lift, then the lid drifts aside.
+    const lid = animate(stage.querySelector(".gift-box-lid"), [
+      { opacity: 1, transform: "translateX(-50%) translateY(0) rotate(0deg)", offset: 0 },
+      { transform: "translateX(-50%) translateY(3px) rotate(-2deg)", offset: .18 },
+      { opacity: 1, transform: "translateX(-50%) translateY(-45px) rotate(-12deg)", offset: .52 },
+      { opacity: 0, transform: "translateX(calc(-50% + 90px)) translateY(-72px) rotate(28deg)", offset: 1 }
+    ], { duration: 1050, delay: 400, easing: "cubic-bezier(.35,0,.2,1)" });
+    lid.onfinish = () => {
+      if ($("resultScreen").dataset.showPhase === "gift") soundManager.play("rewardUnlock");
+    };
+    // The box rim clips the gift while it rises. Slowing at the apex makes its
+    // arrival readable before a small overshoot and a soft, weightless settle.
+    animate($("resultGiftItem"), [
+      { opacity: 0, transform: "translate(-50%, 22px) scale(.48) rotate(-12deg)", offset: 0 },
+      { opacity: 1, transform: "translate(-50%, -36px) scale(.70) rotate(-8deg)", offset: .22 },
+      { opacity: 1, transform: "translate(-50%, -138px) scale(1.13) rotate(5deg)", offset: .60 },
+      { opacity: 1, transform: "translate(-50%, -152px) scale(1.06) rotate(-3deg)", offset: .79 },
+      { opacity: 1, transform: "translate(-50%, -142px) scale(1) rotate(0deg)", offset: 1 }
+    ], { duration: 1900, delay: 1050, easing: "cubic-bezier(.22,.55,.35,1)" });
+    animate(stage.querySelector(".gift-aura"), [{ opacity: 0, transform: "translate(-50%, -50%) scale(.5)" },
+      { opacity: 1, transform: "translate(-50%, -50%) scale(1)" }], { duration: 1100, delay: 900 });
+    animate(stage, [{ opacity: 1 }, { opacity: 0 }], { duration: 220, delay: 3180 });
   }
 
   function saveSession(session) {
@@ -2872,8 +2916,8 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 6 · САЛЮТ · БЕЗ КОРОБКИ</small>
-      <p id="previewHelp">Поздравление → подарок → итог. Без решения заданий. Учебный прогресс не меняется.</p>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 8 · ПОДАРОК → ТАНЕЦ</small>
+      <p id="previewHelp">Коробка → полёт подарка → танец Капи → итог. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
       <label><span id="previewScenarioLabel">Сценарий</span>
@@ -2882,7 +2926,7 @@ function makePowerProblem(max, mastered) {
           <option value="perfect">Без ошибок</option>
           <option value="regular">Обычное завершение</option>
         </select></label>
-      <label class="preview-sound"><input id="previewMotion" type="checkbox" checked><span id="previewMotionLabel">Полная анимация · 7 секунд</span></label>
+      <label class="preview-sound"><input id="previewMotion" type="checkbox" checked><span id="previewMotionLabel">Полная анимация · 8 секунд</span></label>
       <label class="preview-sound"><input id="previewSound" type="checkbox" checked><span id="previewSoundLabel">Со звуком</span></label>
       <button id="previewPlay" class="primary-button" type="button">▶ Смотреть</button>
       <p id="previewStatus" role="status" aria-live="polite"></p>`;
@@ -2895,14 +2939,14 @@ function makePowerProblem(max, mastered) {
       const ru = languageInput.value === "ru";
       $("previewTitle").textContent = ru ? "Финал тренировки" : "Trainingsabschluss";
       $("previewHelp").textContent = ru
-        ? "Поздравление → подарок → итог. Без решения заданий. Учебный прогресс не меняется."
-        : "Feiern → Geschenk → Ergebnis. Ohne Aufgaben. Ihr Lernfortschritt bleibt unverändert.";
+        ? "Коробка → полёт подарка → танец Капи → итог. Без решения заданий. Учебный прогресс не меняется."
+        : "Geschenk öffnen → Geschenk fliegt → Kapi tanzt → Ergebnis. Ohne Aufgaben. Ihr Lernfortschritt bleibt unverändert.";
       $("previewScenarioLabel").textContent = ru ? "Сценарий" : "Variante";
       [...scenarioInput.options].forEach((option, index) => {
         option.textContent = (ru ? ["С новым подарком", "Без ошибок", "Обычное завершение"]
           : ["Mit neuem Geschenk", "Fehlerfreie Runde", "Normaler Abschluss"])[index];
       });
-      $("previewMotionLabel").textContent = ru ? "Полная анимация · 7 секунд" : "Volle Animation · 7 Sekunden";
+      $("previewMotionLabel").textContent = ru ? "Полная анимация · 8 секунд" : "Volle Animation · 8 Sekunden";
       $("previewSoundLabel").textContent = ru ? "Со звуком" : "Mit Ton";
       playButton.textContent = ru ? "▶ Смотреть" : "▶ Abspielen";
     };
