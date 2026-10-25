@@ -388,7 +388,7 @@ h1 { margin: 10px 0 14px; font-size: clamp(2.4rem, 7vw, 4.8rem); line-height: .9
 .result-card .text-button { margin: 18px auto 0; }
 
 .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.confetti-piece { position: absolute; top: -20px; width: 11px; height: 18px; border-radius: 3px; animation: confetti-fall var(--confetti-duration, 2.7s) linear var(--confetti-delay, 0s) 1 both; }
+.confetti-piece { position: absolute; width: 9px; height: 14px; border-radius: 3px; opacity: 0; will-change: transform, opacity; }
 
 .kapi-demo-active .app-shell, .kapi-demo-active .install-prompt { display: none; }
 body.kapi-demo-active { height: auto; min-height: 100dvh; overflow: auto; }
@@ -533,11 +533,6 @@ body.kapi-demo-active { height: auto; min-height: 100dvh; overflow: auto; }
 @keyframes celebrate { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-10px) rotate(3deg); } }
 @keyframes twinkle { 0%,100% { transform: scale(.7) rotate(0); opacity: .55; } 50% { transform: scale(1.2) rotate(30deg); opacity: 1; } }
 @keyframes pop-in { from { transform: scale(.5) translateY(8px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
-@keyframes confetti-fall {
-  from { opacity: 0; transform: translate3d(0, -20px, 0) rotate(0); }
-  10%, 80% { opacity: 1; }
-  to { opacity: 0; transform: translate3d(var(--confetti-drift, 0px), 105vh, 0) rotate(var(--confetti-turn, 720deg)); }
-}
 @keyframes reward-pop { 0% { transform: scale(.45) rotate(-5deg); opacity: 0; } 65% { transform: scale(1.08) rotate(2deg); opacity: 1; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
 @keyframes flag-wave { from { transform: rotate(-3deg) translateY(1px); } to { transform: rotate(4deg) translateY(-5px); } }
 @keyframes party-bounce { from { transform: scale(1) rotate(-2deg); } to { transform: scale(1.04) rotate(2deg) translateY(-5px); } }
@@ -1369,7 +1364,7 @@ body.game-active .game-status { display: none; }
 }
 
 /* Result show: one mascot, three phases, and stable separated final actions. */
-.result-show-title, .result-gift-box, .result-skip { display: none; }
+.result-show-title, .result-skip { display: none; }
 .result-screen .result-average { display: none; }
 .result-screen .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .result-screen[data-show-phase="summary"] .result-mascot { width: min(60vw, 230px); height: clamp(100px, 24vh, 220px); margin: 0 auto; }
@@ -1398,13 +1393,6 @@ body.game-active .game-status { display: none; }
 .result-screen[data-show-phase="celebrate"] #resultRewardGoal { display: none; }
 .result-screen[data-show-phase="gift"] .result-grid { display: none; }
 .result-screen[data-show-phase="gift"] #resultRewardGoal { order: 4; margin: 16px 0 0; animation: result-arrive .4s both; }
-.result-screen[data-show-phase="gift"][data-has-gift="true"] .result-gift-box {
-  display: block; order: 3; position: relative; align-self: center; flex: 0 0 74px; width: 130px;
-  border-radius: 5px 5px 14px 14px; background: linear-gradient(90deg, #159e97 40%, #ffd665 40% 60%, #0e8f87 60%);
-  margin-top: 52px; box-shadow: 0 10px 15px #13605b22; animation: result-arrive .4s both;
-}
-.result-gift-box span { position: absolute; top: -10px; left: -6px; width: 142px; height: 22px; border-radius: 5px; background: linear-gradient(90deg, #26bab0 40%, #ffe181 40% 60%, #26bab0 60%); animation: gift-open .7s .2s both; transform-origin: left center; }
-@keyframes gift-open { to { transform: translate(48px, 24px) rotate(24deg); } }
 @keyframes result-arrive { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
 @media (max-height: 700px) {
   .result-screen[data-show-phase="summary"] .result-mascot { height: 105px; }
@@ -1423,28 +1411,14 @@ body.game-active .game-status { display: none; }
   .result-screen[data-show-phase="summary"] .result-mascot { height: 64px; }
 }
 .result-screen:is([data-show-phase="celebrate"], [data-show-phase="gift"]) .confetti { z-index: 3; }
-.result-gift-box { border: 1px solid #0a827b; }
-.result-gift-box span::before, .result-gift-box span::after {
-  content: ""; position: absolute; bottom: 17px; width: 35px; height: 22px;
-  border: 7px solid #ffcf52; border-radius: 70% 70% 20% 70%;
-}
-.result-gift-box span::before { left: 36px; transform: rotate(20deg); }
-.result-gift-box span::after { right: 36px; transform: rotate(70deg); }
-
 /* A user-selected full-motion demo may override the device preference here only.
    Normal beta training continues to respect reduced motion. */
 @media (prefers-reduced-motion: reduce) {
   body.result-preview.preview-full-motion .result-screen .result-grid,
   body.result-preview.preview-full-motion .result-screen .result-grid > div:nth-child(3),
   body.result-preview.preview-full-motion .result-screen #resultRewardGoal,
-  body.result-preview.preview-full-motion .result-screen .result-gift-box,
   body.result-preview.preview-full-motion .result-screen .result-show-progress {
     animation: result-arrive .45s ease both !important;
   }
-  body.result-preview.preview-full-motion .result-screen .result-gift-box span {
-    animation: gift-open .7s .2s both !important;
-  }
-  body.result-preview.preview-full-motion .result-screen .confetti-piece {
-    animation: confetti-fall var(--confetti-duration, 2.7s) linear var(--confetti-delay, 0s) 1 both !important;
-  }
+
 }

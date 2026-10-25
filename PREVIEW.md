@@ -62,3 +62,28 @@ executable checks: `/workspace/artifacts/beta-result/` outside this checkout.
 JavaScript syntax and whitespace checks pass. Short screens still use the
 existing smaller gift-phase mascot. Real iOS installation is unverified.
 The user authorized publishing this correction to beta.
+
+## DEMO 6 — radial salute, no box, 2026-10-25
+
+The user requested an outward salute rather than falling confetti and removal
+of the gift box, and authorized immediate beta publication for review.
+- Removed the box markup and its lid/bow animations from both app entry pages.
+  Earned reward announcements remain.
+- Replaced CSS falling confetti with four staggered radial bursts driven by
+  Web Animations. Each origin emits particles in both horizontal directions,
+  with an upward arc, gravity and individual spin. Explicit static mode emits
+  no particles; full-motion preview works with either OS motion preference.
+- Raised feet farther inside the shins and excluded the painted raised collar
+  from the foot render. Feet draw first, shins overlap them, then the torso.
+- Preview marker: DEMO 6 · САЛЮТ · БЕЗ КОРОБКИ.
+  Worker and beta-version: 20261025-result-preview-6.
+
+Chromium checks cover the marker, absence of box elements, four distinct burst
+origins and trajectories spreading both ways, summary navigation, both motion
+preferences, static mode and absence of page errors. Captured celebration,
+reward and summary at 390x844 and 320x568, plus close-up feet and intermediate
+burst frames under `/workspace/artifacts/beta-result/`. Syntax and whitespace
+checks pass. Public browser TLS trust is unavailable in this environment;
+published bytes are checked using verified HTTPS instead. Real iOS remains
+unverified. An already installed beta worker can retain an older preview;
+a private browser tab provides a separate session without deleting progress.

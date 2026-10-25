@@ -80,8 +80,8 @@
   };
 
   const LEG_JOINTS = {
-    left: { leg: "legLeft", foot: "footLeft", hip: [229, 48], ankle: [157, 282], footAnkle: [216, 30] },
-    right: { leg: "legRight", foot: "footRight", hip: [41, 48], ankle: [111, 282], footAnkle: [77, 30] }
+    left: { leg: "legLeft", foot: "footLeft", hip: [229, 48], ankle: [157, 282], footAnkle: [216, 60] },
+    right: { leg: "legRight", foot: "footRight", hip: [41, 48], ankle: [111, 282], footAnkle: [77, 60] }
   };
 
   class KapiAnimator {
@@ -643,7 +643,11 @@
       } else {
         context.translate(joint.ankle[0] - joint.hip[0], joint.ankle[1] - joint.hip[1]);
         context.rotate(ankleRotation);
-        context.drawImage(foot.image, -joint.footAnkle[0], -joint.footAnkle[1]);
+        // The foot artwork has a raised collar. Hide that baked-in rim so the
+        // shin, drawn next, visibly continues over the top of the toes.
+        const cuff = joint.footAnkle[1];
+        context.drawImage(foot.image, 0, cuff, foot.image.width, foot.image.height - cuff,
+          -joint.footAnkle[0], 0, foot.image.width, foot.image.height - cuff);
       }
       context.restore();
     }
@@ -690,7 +694,7 @@
         this.drawCosmetic(context, "back", outfit.back, pose, limbs);
         const flagArm = options.state === "flag" && this.loadImage(RIG_PARTS.armRightFlag).ready;
         const flagWave = Math.sin((options.elapsed || 0) / 1000 * 5.6);
-        // Feet sit behind the overlapping shin ends, sharing the same ankle pivot.
+        // Draw toes behind the shins; bury the painted ankle cuff inside each leg.
         this.drawLegLayer(context, "left", 319, 470, .37, limbs.leftHip, limbs.leftAnkle, "foot");
         this.drawLegLayer(context, "right", 381, 470, .37, limbs.rightHip, limbs.rightAnkle, "foot");
         this.drawLegLayer(context, "left", 319, 470, .37, limbs.leftHip, limbs.leftAnkle, "leg");

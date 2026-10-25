@@ -2322,13 +2322,34 @@ function makePowerProblem(max, mastered) {
       $("confetti").innerHTML = "";
       return;
     }
-    const colors = ["#0f766e", "#f8c438", "#e76555", "#46b8aa", "#ffffff"];
-    $("confetti").innerHTML = Array.from({ length: count }, (_, i) => {
-      const duration = 3.2 + Math.random() * 1.8;
-      // Start at different heights, including in the explicit full-motion preview.
-      const delay = -Math.random() * duration * .65;
-      return `<i class="confetti-piece" style="left:${randomInt(6, 94)}%;background:${colors[i % colors.length]};--confetti-delay:${delay.toFixed(2)}s;--confetti-duration:${duration.toFixed(2)}s;--confetti-drift:${randomInt(-45, 45)}px;--confetti-turn:${randomInt(-720, 720)}deg"></i>`;
-    }).join("");
+    const colors = ["#0f766e", "#f8c438", "#e76555", "#46b8aa", "#ffc857"];
+    const container = $("confetti");
+    container.replaceChildren();
+    const origins = [[18, 48], [82, 40], [30, 32], [70, 27]];
+    const radius = Math.min(container.clientWidth * .48, 190);
+    // Each burst fans out radially from one point, rather than falling in a row.
+    origins.forEach(([left, top], burst) => {
+      for (let i = 0; i < Math.ceil(count / 2); i++) {
+        const piece = document.createElement("i");
+        piece.className = "confetti-piece";
+        piece.style.left = `${left}%`;
+        piece.style.top = `${top}%`;
+        piece.style.background = colors[(i + burst) % colors.length];
+        container.appendChild(piece);
+        const angle = (i / Math.ceil(count / 2)) * Math.PI * 2 + Math.random() * .25;
+        const distance = radius * (.55 + Math.random() * .45);
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance - 65;
+        const spin = randomInt(-540, 540);
+        piece.animate([
+          { opacity: 0, transform: "translate(-50%, -50%) scale(.2) rotate(0deg)", offset: 0 },
+          { opacity: 1, offset: .08 },
+          { opacity: 1, transform: `translate(${x * .72}px, ${y}px) scale(1) rotate(${spin * .6}deg)`, offset: .5 },
+          { opacity: 0, transform: `translate(${x}px, ${y + 150}px) scale(.65) rotate(${spin}deg)`, offset: 1 }
+        ], { duration: 1600 + Math.random() * 600, delay: burst * 620 + Math.random() * 100,
+          easing: "cubic-bezier(.12,.5,.35,1)", fill: "both" });
+      }
+    });
   }
 
   let motivationTimer = 0;
@@ -2851,7 +2872,7 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 5</small>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 6 · САЛЮТ · БЕЗ КОРОБКИ</small>
       <p id="previewHelp">Поздравление → подарок → итог. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
