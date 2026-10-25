@@ -80,8 +80,8 @@
   };
 
   const LEG_JOINTS = {
-    left: { leg: "legLeft", foot: "footLeft", hip: [229, 48], ankle: [211, 288], footAnkle: [238, 24] },
-    right: { leg: "legRight", foot: "footRight", hip: [41, 48], ankle: [59, 286], footAnkle: [52, 24] }
+    left: { leg: "legLeft", foot: "footLeft", hip: [229, 48], ankle: [157, 282], footAnkle: [216, 30] },
+    right: { leg: "legRight", foot: "footRight", hip: [41, 48], ankle: [111, 282], footAnkle: [77, 30] }
   };
 
   class KapiAnimator {
@@ -690,6 +690,9 @@
         this.drawCosmetic(context, "back", outfit.back, pose, limbs);
         const flagArm = options.state === "flag" && this.loadImage(RIG_PARTS.armRightFlag).ready;
         const flagWave = Math.sin((options.elapsed || 0) / 1000 * 5.6);
+        // Feet sit behind the overlapping shin ends, sharing the same ankle pivot.
+        this.drawLegLayer(context, "left", 319, 470, .37, limbs.leftHip, limbs.leftAnkle, "foot");
+        this.drawLegLayer(context, "right", 381, 470, .37, limbs.rightHip, limbs.rightAnkle, "foot");
         this.drawLegLayer(context, "left", 319, 470, .37, limbs.leftHip, limbs.leftAnkle, "leg");
         this.drawLegLayer(context, "right", 381, 470, .37, limbs.rightHip, limbs.rightAnkle, "leg");
         this.drawPart(context, "torso", 350, 389, .69, 0, 280.5, 229);
@@ -698,8 +701,6 @@
         this.drawArmLayer(context, "left", 275, 304, .365, limbs.leftShoulder, limbs.leftElbow, limbs.leftWrist, "upper");
         if (flagArm) this.drawPart(context, "armRightFlag", 440, 345, .58, flagWave * .035, 150, 570);
         else this.drawArmLayer(context, "right", 425, 304, .365, limbs.rightShoulder, limbs.rightElbow, limbs.rightWrist, "upper");
-        this.drawLegLayer(context, "left", 319, 470, .37, limbs.leftHip, limbs.leftAnkle, "foot");
-        this.drawLegLayer(context, "right", 381, 470, .37, limbs.rightHip, limbs.rightAnkle, "foot");
         this.drawArmLayer(context, "left", 275, 304, .365, limbs.leftShoulder, limbs.leftElbow, limbs.leftWrist, "lower");
         if (!flagArm) this.drawArmLayer(context, "right", 425, 304, .365, limbs.rightShoulder, limbs.rightElbow, limbs.rightWrist, "lower");
       }

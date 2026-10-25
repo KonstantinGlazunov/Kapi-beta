@@ -2324,7 +2324,7 @@ function makePowerProblem(max, mastered) {
     }
     const colors = ["#0f766e", "#f8c438", "#e76555", "#46b8aa", "#ffffff"];
     $("confetti").innerHTML = Array.from({ length: count }, (_, i) =>
-      `<i class="confetti-piece" style="left:${randomInt(2, 98)}%;background:${colors[i % colors.length]};animation-delay:${(Math.random() * 1.8).toFixed(2)}s;animation-duration:${(2.1 + Math.random() * 1.7).toFixed(2)}s"></i>`
+      `<i class="confetti-piece" style="left:${randomInt(2, 98)}%;background:${colors[i % colors.length]};--fall-delay:${(Math.random() * 1.8).toFixed(2)}s;--fall-duration:${(2.1 + Math.random() * 1.7).toFixed(2)}s;--fall-drift:${randomInt(-100, 100)}px;--fall-start:${randomInt(-180, 180)}deg;--fall-spin:${randomInt(-900, 900)}deg"></i>`
     ).join("");
   }
 
@@ -2848,7 +2848,7 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 3</small>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 4</small>
       <p id="previewHelp">Поздравление → подарок → итог. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
