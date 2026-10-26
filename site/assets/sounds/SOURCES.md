@@ -38,3 +38,6 @@ Bundled sound effects below are stock assets released under Creative Commons Zer
 - In-app attribution is available in Settings. Playback starts with the result presentation and plays once to the end of
   four bars (16 beats at 144 BPM, 6.666667 s). Scene changes within the
   presentation do not cut the music. Leaving, mute or tab hiding still stop it.
+
+DEMO 11: presentation-music.mp3 is the full same licensed stock track,
+transcoded to mono 32 kHz / 96 kbps MP3. Loops until user interaction.

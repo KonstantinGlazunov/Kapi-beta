@@ -1469,3 +1469,14 @@ body.game-active .game-status { display: none; }
   .result-screen[data-show-phase="gift"] .result-card { min-height: 420px; padding-top: 38px; }
   .result-screen[data-show-phase="gift"] .result-show-title { font-size: 1.5rem; }
 }
+
+/* Demo 11: dance, individual discoveries, then a quiet results page. */
+.result-screen[data-show-phase="summary"] .result-card { display: flex; flex-direction: column; align-items: stretch; gap: 14px; height: auto; min-height: 0; padding-bottom: 24px; }
+.result-screen[data-show-phase="summary"] .result-card :is(#againButton, #shareButton, #resultStatsButton) { display: block; position: static; flex: 0 0 auto; width: min(100%, 330px); min-height: 48px; margin: 0 auto; transform: none; }
+.result-screen[data-show-phase="summary"] #againButton { margin-bottom: 10px; }
+.result-screen[data-show-phase="summary"] #rewardReveal { display: none; }
+.result-screen[data-show-phase="celebrate"] #resultRewardGoal { display: none; }
+.result-screen[data-show-phase="gift"] .result-gift-stage { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 28px; width: 100%; height: auto; min-height: 300px; position: relative; }
+.result-screen[data-show-phase="gift"] .gift-item { position: relative; inset: auto; width: 160px; height: 160px; object-fit: contain; opacity: 1; transform: none; filter: drop-shadow(0 15px 20px #e3b74855); }
+.result-screen[data-show-phase="gift"] .gift-aura { inset: 35% auto auto 50%; width: 260px; height: 260px; opacity: .65; transform: translate(-50%,-50%); }
+#resultGiftName { position: relative; font-size: 1.5rem; color: var(--teal-dark); }

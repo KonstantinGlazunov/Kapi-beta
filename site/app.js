@@ -303,7 +303,7 @@
   let resultGiftAnimations = [];
   let revealResultReward = null;
 
-  function endResultShow() {
+  function endResultShow(keepMusic = false) {
     resultGiftAnimations.forEach((animation) => animation.cancel());
     resultGiftAnimations = [];
     window.clearTimeout(resultShowTimer);
@@ -318,7 +318,7 @@
     $("skipResultShow").classList.add("hidden");
     $("resultRewardProgress").classList.remove("hidden");
     $("confetti").innerHTML = "";
-    soundManager?.stopAll();
+    if (!keepMusic) soundManager?.stopAll();
     kapi?.reset("result", "idle");
   }
   let sessionSequence = 0;
@@ -2196,67 +2196,41 @@ function makePowerProblem(max, mastered) {
     $("skipResultShow").classList.remove("hidden");
     $("resultShowProgress").textContent = `${ru ? "Шаг вперёд" : "Ein Schritt weiter"} · ${copy.homeStage(state.stage)}`;
     $("resultScreen").dataset.hasGift = String(hasGift);
-    const celebrate = () => {
-      $("resultScreen").dataset.showPhase = "celebrate";
-      $("resultShowTitle").textContent = perfect ? copy.perfectTitle : ru ? "Капи празднует!" : "Kapi feiert!";
-      revealResultReward?.(false);
-      kapi.reset("result", "trainingFinished");
-      makeConfetti(perfect ? 36 : 28);
+    const earnedItems = unlocked.map((event) => rewards.getRewards().find((item) => item.id === event.rewardId));
+    const showItems = (index = 0) => {
+      if (index >= earnedItems.length) { endResultShow(true); return; }
+      $("resultScreen").dataset.showPhase = "gift";
+      $("resultShowTitle").textContent = ru ? "Новое для Капи!" : "Neu für Kapi!";
+      $("resultGiftName").textContent = rewardName(earnedItems[index]);
+      playGiftPresentation(earnedItems[index]);
+      resultPhaseTimer = window.setTimeout(() => showItems(index + 1), 2600);
     };
+    $("resultScreen").dataset.showPhase = "celebrate";
+    $("resultShowTitle").textContent = ru ? "Тренировка окончена!" : "Training beendet!";
+    soundManager.playPresentationMusic().catch(() => {});
     if (reduceResultMotion()) {
-      endResultShow();
+      endResultShow(true);
       return;
     }
-    if (hasGift) {
-      $("resultScreen").dataset.showPhase = "gift";
-      $("resultShowTitle").textContent = ru ? "Ты заслужил подарок!" : "Ein Geschenk für dich!";
-      const reward = rewards.getRewards().find((item) => item.id === unlocked[0].rewardId);
-      playGiftPresentation(reward);
-      resultPhaseTimer = window.setTimeout(celebrate, 3400);
-    } else celebrate();
-    // Four bars at the track's 144 BPM: 16 beats = 6 2/3 seconds.
-    // Natural audio completion ends the show; a timer also covers muted audio.
-    resultShowTimer = window.setTimeout(endResultShow, 6667);
-    soundManager.playPresentationMusic({ onEnded: endResultShow }).then((started) => {
-      if (started && $("resultScreen").dataset.showPhase !== "summary") {
-        window.clearTimeout(resultShowTimer);
-        resultShowTimer = window.setTimeout(endResultShow, 7000);
-      }
-    }).catch(() => {});
+    kapi.reset("result", "trainingFinished");
+    makeConfetti(perfect ? 36 : 28);
+    resultPhaseTimer = window.setTimeout(() => {
+      $("confetti").innerHTML = "";
+      kapi.reset("result", "idle");
+      showItems();
+    }, 4000);
   }
 
   function playGiftPresentation(reward) {
     resultGiftAnimations.forEach((animation) => animation.cancel());
     resultGiftAnimations = [];
-    const stage = $("resultGiftStage");
-    $("resultGiftItem").src = `assets/cosmetics/${reward.asset}.svg`;
-    const animate = (element, frames, timing) => {
-      const animation = element.animate(frames, { fill: "both", ...timing });
-      resultGiftAnimations.push(animation);
-      return animation;
-    };
-    // A short anticipation, a hinge-like lift, then the lid drifts aside.
-    const lid = animate(stage.querySelector(".gift-box-lid"), [
-      { opacity: 1, transform: "translateX(-50%) translateY(0) rotate(0deg)", offset: 0 },
-      { transform: "translateX(-50%) translateY(3px) rotate(-2deg)", offset: .18 },
-      { opacity: 1, transform: "translateX(-50%) translateY(-45px) rotate(-12deg)", offset: .52 },
-      { opacity: 0, transform: "translateX(calc(-50% + 90px)) translateY(-72px) rotate(28deg)", offset: 1 }
-    ], { duration: 1050, delay: 400, easing: "cubic-bezier(.35,0,.2,1)" });
-    lid.onfinish = () => {
-      if ($("resultScreen").dataset.showPhase === "gift") soundManager.play("rewardUnlock");
-    };
-    // The box rim clips the gift while it rises. Slowing at the apex makes its
-    // arrival readable before a small overshoot and a soft, weightless settle.
-    animate($("resultGiftItem"), [
-      { opacity: 0, transform: "translate(-50%, 22px) scale(.48) rotate(-12deg)", offset: 0 },
-      { opacity: 1, transform: "translate(-50%, -36px) scale(.70) rotate(-8deg)", offset: .22 },
-      { opacity: 1, transform: "translate(-50%, -138px) scale(1.13) rotate(5deg)", offset: .60 },
-      { opacity: 1, transform: "translate(-50%, -152px) scale(1.06) rotate(-3deg)", offset: .79 },
-      { opacity: 1, transform: "translate(-50%, -142px) scale(1) rotate(0deg)", offset: 1 }
-    ], { duration: 1900, delay: 1050, easing: "cubic-bezier(.22,.55,.35,1)" });
-    animate(stage.querySelector(".gift-aura"), [{ opacity: 0, transform: "translate(-50%, -50%) scale(.5)" },
-      { opacity: 1, transform: "translate(-50%, -50%) scale(1)" }], { duration: 1100, delay: 900 });
-    animate(stage, [{ opacity: 1 }, { opacity: 0 }], { duration: 220, delay: 3180 });
+    const item = $("resultGiftItem");
+    item.src = `assets/cosmetics/${reward.asset}.svg`;
+    resultGiftAnimations.push(item.animate([
+      { opacity: 0, transform: "translateY(60px) scale(.35) rotate(-18deg)" },
+      { opacity: 1, transform: "translateY(-12px) scale(1.12) rotate(5deg)", offset: .65 },
+      { opacity: 1, transform: "translateY(0) scale(1) rotate(0deg)" }
+    ], { duration: 900, easing: "cubic-bezier(.2,.7,.3,1)", fill: "both" }));
   }
 
   function saveSession(session) {
@@ -2926,8 +2900,8 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 10 · ЦЕЛЬНАЯ МУЗЫКА</small>
-      <p id="previewHelp">Коробка → полёт подарка → танец Капи → итог. Без решения заданий. Учебный прогресс не меняется.</p>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 11 · НОВЫЙ ФИНАЛ</small>
+      <p id="previewHelp">Танец и салют → новые предметы → результаты. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
       <label><span id="previewScenarioLabel">Сценарий</span>
@@ -2936,7 +2910,7 @@ function makePowerProblem(max, mastered) {
           <option value="perfect">Без ошибок</option>
           <option value="regular">Обычное завершение</option>
         </select></label>
-      <label class="preview-sound"><input id="previewMotion" type="checkbox" checked><span id="previewMotionLabel">Полная анимация · 7 секунд</span></label>
+      <label class="preview-sound"><input id="previewMotion" type="checkbox" checked><span id="previewMotionLabel">Полная анимация</span></label>
       <label class="preview-sound"><input id="previewSound" type="checkbox" checked><span id="previewSoundLabel">Со звуком</span></label>
       <button id="previewPlay" class="primary-button" type="button">▶ Смотреть</button>
       <p id="previewStatus" role="status" aria-live="polite"></p>`;
@@ -2949,14 +2923,14 @@ function makePowerProblem(max, mastered) {
       const ru = languageInput.value === "ru";
       $("previewTitle").textContent = ru ? "Финал тренировки" : "Trainingsabschluss";
       $("previewHelp").textContent = ru
-        ? "Коробка → полёт подарка → танец Капи → итог. Без решения заданий. Учебный прогресс не меняется."
-        : "Geschenk öffnen → Geschenk fliegt → Kapi tanzt → Ergebnis. Ohne Aufgaben. Ihr Lernfortschritt bleibt unverändert.";
+        ? "Танец и салют → новые предметы → результаты. Без решения заданий. Учебный прогресс не меняется."
+        : "Tanz und Konfetti → neue Gegenstände → Ergebnis. Ohne Aufgaben. Ihr Lernfortschritt bleibt unverändert.";
       $("previewScenarioLabel").textContent = ru ? "Сценарий" : "Variante";
       [...scenarioInput.options].forEach((option, index) => {
         option.textContent = (ru ? ["С новым подарком", "Без ошибок", "Обычное завершение"]
           : ["Mit neuem Geschenk", "Fehlerfreie Runde", "Normaler Abschluss"])[index];
       });
-      $("previewMotionLabel").textContent = ru ? "Полная анимация · 7 секунд" : "Volle Animation · 7 Sekunden";
+      $("previewMotionLabel").textContent = ru ? "Полная анимация" : "Volle Animation";
       $("previewSoundLabel").textContent = ru ? "Со звуком" : "Mit Ton";
       playButton.textContent = ru ? "▶ Смотреть" : "▶ Abspielen";
     };
@@ -3038,7 +3012,7 @@ function makePowerProblem(max, mastered) {
       if (!button) return;
       if (button.id === "againButton") {
         event.preventDefault(); event.stopImmediatePropagation(); play();
-      } else if (["settingsButton", "homeButton", "shareButton", "resultStatsButton"].includes(button.id)) {
+      } else if (["settingsButton", "homeButton"].includes(button.id)) {
         event.preventDefault(); event.stopImmediatePropagation(); openControls();
       }
     }, true);
@@ -3049,6 +3023,15 @@ function makePowerProblem(max, mastered) {
     dialog.showModal();
   }
 
+  document.addEventListener("click", () => {
+    if ($("resultScreen").classList.contains("active")) soundManager?.stopChannel("music");
+  }, true);
+  document.addEventListener("pointerdown", () => {
+    if ($("resultScreen").classList.contains("active")) soundManager?.stopChannel("music");
+  }, true);
+  document.addEventListener("keydown", () => {
+    if ($("resultScreen").classList.contains("active")) soundManager?.stopChannel("music");
+  }, true);
   $("startButton").addEventListener("click", () => startTrainingWithIntro());
   $("homeMascot").addEventListener("click", playHomeReaction);
   document.querySelector(".app-shell").addEventListener("pointerdown", (event) => {

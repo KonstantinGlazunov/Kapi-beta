@@ -157,3 +157,17 @@ Icon manifest URLs are versioned. Browser tests measured 6.68/6.69s to natural
 completion, confirmed the same source across gift/dance and no old foot sprites.
 Visual evidence: /workspace/artifacts/beta-result/legs-static-audit.png and
 phrase-{production,beta}-dance.png. DEMO 10 / cache result-preview-10.
+
+## DEMO 11 — dance → discoveries → results (beta only)
+
+Dance and radial confetti begin immediately, with “Training finished”. After
+4 seconds, each genuinely unlocked item gets its own 2.6-second animated reveal,
+without a box or a prize ceremony. No new item means direct transition to results.
+Summary has no repeated unlock announcement. Result actions use a vertical flex
+layout with reserved gaps, including space for the primary button shadow.
+The full licensed stock track plays continuously across every phase and the
+summary, loops, and fades out on user interaction, navigation, mute or hidden tab.
+Reduced motion goes straight to summary. Preview keeps all progress isolated.
+Cache result-preview-11. Chromium verified at 360 and 390 px, screenshots inspected
+at /workspace/artifacts/beta11; dance/item/results visual quality 9/10, action
+separation 10/10. Production is unchanged.

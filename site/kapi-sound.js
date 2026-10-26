@@ -26,7 +26,7 @@
   const PRIORITY = { start: 1, correct: 10, wrong: 20, recovered: 30, mastered: 35, flag: 40, speedImproved: 45, party: 50, dance: 60, personalRecord: 70, levelUp: 80, complete10: 90, complete20: 90, complete30: 90, perfect: 95, rewardUnlock: 96 };
   const ALIASES = { streak: "flag", handshake: "levelUp", complete: "complete20" };
   const SAMPLE_SOURCES = {
-    danceMusic: "assets/sounds/dance-music.wav",
+    danceMusic: "assets/sounds/presentation-music.mp3",
     start: "assets/sounds/start.wav",
     correct: "assets/sounds/correct.wav",
     wrong: "assets/sounds/wrong.wav",
@@ -126,11 +126,11 @@
       const gain = this.context.createGain();
       const now = this.context.currentTime;
       source.buffer = buffer;
-      source.loop = false;
+      source.loop = true;
       gain.gain.setValueAtTime(.0001, now);
       gain.gain.exponentialRampToValueAtTime(.22, now + .16);
       source.connect(gain).connect(this.context.destination);
-      const entry = { priority: 60, until: now + buffer.duration, nodes: [{ source, gain }] };
+      const entry = { priority: 60, until: Infinity, nodes: [{ source, gain }] };
       this.channels.get("music").add(entry);
       source.onended = () => {
         source.disconnect(); gain.disconnect();
