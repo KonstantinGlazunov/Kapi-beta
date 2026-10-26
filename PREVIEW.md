@@ -129,3 +129,18 @@ with an installed DEMO 3 worker and verified by screenshots, without deleting
 learning data. Public bytes are checked over verified HTTPS; live Chromium TLS
 trust remains unavailable, so rendering checks use matching local files.
 The user authorized immediate beta publication for review.
+
+## DEMO 9 — selected stock dance music
+
+The user chose option 1, “Monkeys Spinning Monkeys” by Kevin MacLeod, and
+explicitly authorized immediate merging and publication in beta and production.
+A 6.667-second CC BY 4.0 excerpt is bundled as `assets/sounds/dance-music.wav`.
+Attribution, license and edits are recorded in SOURCES.md and linked in Settings.
+A separate music channel starts on the result dance, loops, and fades on scene
+exit, mute or tab hiding. A decoding race cannot start music after cancellation.
+The gift-to-dance timeline and continuous limbs remain in beta. DEMO 9 / worker
+`beta-20261025-result-preview-9`; the new WAV is precached for offline use.
+The same audio manager passed production's 169 tests including 3 music lifecycle
+regressions. Actual Chromium in beta and production decoded and played the WAV
+(6.667 s, RMS 0.076), verified looping, mute, restart and exit, without page errors.
+Evidence: `/workspace/artifacts/beta-result/music-browser.cjs`, `music-*-dance.png`.

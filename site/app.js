@@ -2201,7 +2201,6 @@ function makePowerProblem(max, mastered) {
       $("resultShowTitle").textContent = perfect ? copy.perfectTitle : ru ? "Капи празднует!" : "Kapi feiert!";
       revealResultReward?.(false);
       kapi.reset("result", "trainingFinished");
-      soundManager.play("dance");
       makeConfetti(perfect ? 36 : 28);
     };
     if (reduceResultMotion()) {
@@ -2457,6 +2456,11 @@ function makePowerProblem(max, mastered) {
       wardrobeHost: $("wardrobeMascot")
     });
     return new window.KapiStateMachine(animator, {
+      onStateChange(animationState, surface) {
+        if (surface === "result" && ["dance", "trainingFinished"].includes(animationState)) {
+          soundManager.playDanceMusic().catch(() => {});
+        } else soundManager.stopChannel("music");
+      },
       soundPlayer(type, animationState) {
         if (animationState === "hey") {
           window.clearTimeout(greetingTimer);
@@ -2916,7 +2920,7 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 8 · ПОДАРОК → ТАНЕЦ</small>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 9 · ТАНЕЦ С МУЗЫКОЙ</small>
       <p id="previewHelp">Коробка → полёт подарка → танец Капи → итог. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
