@@ -2214,7 +2214,15 @@ function makePowerProblem(max, mastered) {
       playGiftPresentation(reward);
       resultPhaseTimer = window.setTimeout(celebrate, 3400);
     } else celebrate();
-    resultShowTimer = window.setTimeout(endResultShow, hasGift ? 7800 : 4400);
+    // Four bars at the track's 144 BPM: 16 beats = 6 2/3 seconds.
+    // Natural audio completion ends the show; a timer also covers muted audio.
+    resultShowTimer = window.setTimeout(endResultShow, 6667);
+    soundManager.playPresentationMusic({ onEnded: endResultShow }).then((started) => {
+      if (started && $("resultScreen").dataset.showPhase !== "summary") {
+        window.clearTimeout(resultShowTimer);
+        resultShowTimer = window.setTimeout(endResultShow, 7000);
+      }
+    }).catch(() => {});
   }
 
   function playGiftPresentation(reward) {
@@ -2457,9 +2465,7 @@ function makePowerProblem(max, mastered) {
     });
     return new window.KapiStateMachine(animator, {
       onStateChange(animationState, surface) {
-        if (surface === "result" && ["dance", "trainingFinished"].includes(animationState)) {
-          soundManager.playDanceMusic().catch(() => {});
-        } else soundManager.stopChannel("music");
+        if (surface !== "result") soundManager.stopChannel("music");
       },
       soundPlayer(type, animationState) {
         if (animationState === "hey") {
@@ -2920,7 +2926,7 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 9 · ТАНЕЦ С МУЗЫКОЙ</small>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 10 · ЦЕЛЬНАЯ МУЗЫКА</small>
       <p id="previewHelp">Коробка → полёт подарка → танец Капи → итог. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
@@ -2930,7 +2936,7 @@ function makePowerProblem(max, mastered) {
           <option value="perfect">Без ошибок</option>
           <option value="regular">Обычное завершение</option>
         </select></label>
-      <label class="preview-sound"><input id="previewMotion" type="checkbox" checked><span id="previewMotionLabel">Полная анимация · 8 секунд</span></label>
+      <label class="preview-sound"><input id="previewMotion" type="checkbox" checked><span id="previewMotionLabel">Полная анимация · 7 секунд</span></label>
       <label class="preview-sound"><input id="previewSound" type="checkbox" checked><span id="previewSoundLabel">Со звуком</span></label>
       <button id="previewPlay" class="primary-button" type="button">▶ Смотреть</button>
       <p id="previewStatus" role="status" aria-live="polite"></p>`;
@@ -2950,7 +2956,7 @@ function makePowerProblem(max, mastered) {
         option.textContent = (ru ? ["С новым подарком", "Без ошибок", "Обычное завершение"]
           : ["Mit neuem Geschenk", "Fehlerfreie Runde", "Normaler Abschluss"])[index];
       });
-      $("previewMotionLabel").textContent = ru ? "Полная анимация · 8 секунд" : "Volle Animation · 8 Sekunden";
+      $("previewMotionLabel").textContent = ru ? "Полная анимация · 7 секунд" : "Volle Animation · 7 Sekunden";
       $("previewSoundLabel").textContent = ru ? "Со звуком" : "Mit Ton";
       playButton.textContent = ru ? "▶ Смотреть" : "▶ Abspielen";
     };

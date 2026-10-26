@@ -144,3 +144,16 @@ The same audio manager passed production's 169 tests including 3 music lifecycle
 regressions. Actual Chromium in beta and production decoded and played the WAV
 (6.667 s, RMS 0.076), verified looping, mute, restart and exit, without page errors.
 Evidence: `/workspace/artifacts/beta-result/music-browser.cjs`, `music-*-dance.png`.
+
+## DEMO 10 — complete musical phrase from the beginning
+
+Starts the selected music with the gift/result presentation, rather than waiting
+for the dance. The source plays once, without restarting on intermediate scenes,
+for four full bars at 144 BPM (6.666667 seconds). Natural audio completion ends
+the show; a timer covers muted/unavailable audio. Explicit skip/mute/hidden tab
+still cancel playback. Production now uses the same continuous-leg rig; static
+poses, welcome sheet and icons are re-rendered from that model in both repos.
+Icon manifest URLs are versioned. Browser tests measured 6.68/6.69s to natural
+completion, confirmed the same source across gift/dance and no old foot sprites.
+Visual evidence: /workspace/artifacts/beta-result/legs-static-audit.png and
+phrase-{production,beta}-dance.png. DEMO 10 / cache result-preview-10.
