@@ -319,7 +319,7 @@
     $("resultRewardProgress").classList.remove("hidden");
     $("confetti").innerHTML = "";
     if (!keepMusic) soundManager?.stopAll();
-    kapi?.reset("result", "idle");
+    kapi?.reset("result", $("resultScreen").classList.contains("active") && !reduceResultMotion() ? "trainingFinished" : "idle");
   }
   let sessionSequence = 0;
 
@@ -2900,7 +2900,7 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 11 · НОВЫЙ ФИНАЛ</small>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 12 · ТАНЕЦ НА ФИНАЛЕ</small>
       <p id="previewHelp">Танец и салют → новые предметы → результаты. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>

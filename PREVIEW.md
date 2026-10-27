@@ -171,3 +171,9 @@ Reduced motion goes straight to summary. Preview keeps all progress isolated.
 Cache result-preview-11. Chromium verified at 360 and 390 px, screenshots inspected
 at /workspace/artifacts/beta11; dance/item/results visual quality 9/10, action
 separation 10/10. Production is unchanged.
+
+## DEMO 12 — keep dancing on the final result
+
+The active summary uses looping trainingFinished instead of idle. Reduced-motion
+mode keeps the static pose. Music and action spacing retain DEMO 11 behavior.
+Production unchanged. Cache result-preview-12.
