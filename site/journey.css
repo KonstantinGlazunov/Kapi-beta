@@ -58,3 +58,5 @@ body.start-active .home-hero { background-size: auto 135%; overflow: hidden; }
 .journey-choice > p { display: none; }
 .journey-choice-canvas { width: 100%; height: 170px; object-fit: contain; }
 .result-screen[data-show-phase="arrival"] .result-skip { top: 0; margin: 0; }
+/* The travel scene appears at arrival, after the standalone dance card. */
+.result-screen[data-show-phase="celebrate"] { background: none; }

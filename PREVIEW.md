@@ -215,3 +215,10 @@ Pages deploy. Public HTTPS double-slash beta URLs matched all 14 checked files
 byte-for-byte, including worker, both HTML pages, JS/CSS, scenery and four new
 item illustrations. Final screenshots also confirm saved equipment and accessible
 home controls at 320 px. No production files were changed.
+
+## DEMO 14 — standalone dance background
+
+Hide the result screen's travel background during celebrate, restoring it for
+arrival. Chromium at 390×844 confirmed background-image:none during dance and
+the forest scene on arrival. Inspected screenshot: journey13/dance-clean.png.
+Worker journey-14; beta only.
