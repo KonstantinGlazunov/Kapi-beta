@@ -177,3 +177,35 @@ separation 10/10. Production is unchanged.
 The active summary uses looping trainingFinished instead of idle. Reduced-motion
 mode keeps the static pose. Music and action spacing retain DEMO 11 behavior.
 Production unchanged. Cache result-preview-12.
+
+## DEMO 13 — first journey to the forest lake (2026-10-28)
+
+Beta-only route: clearing → bridge → pine rest → lake. One completed session
+advances one stop; incomplete sessions and duplicate session IDs do not advance.
+The route caps at three, independent of mathematical mastery and XP. Old profiles
+start at zero; existing XP, unlock IDs and equipment remain. Journey and selected
+variants are included in backup validation and local persistence.
+
+Home uses the new illustrated panorama, location, next stop and four route dots.
+Finale: 4 s dance → 2.5 s arrival when advancing → unlocked items / choice →
+summary with dancing Kapi. Music continues until interaction, exit/mute/hidden.
+Reduced motion goes directly to the static summary. Summary returns home.
+Two scarf designs at 140 XP and two backpack designs at 200 XP retain the old
+reward IDs. Garment coloring is applied to the existing textured torso, including
+straps, so no second garment is drawn over the embedded one. Variants can be
+previewed as a future target and changed in the wardrobe once owned.
+
+Demo: result-preview.html?demo=13. Select scarf/backpack/regular to inspect
+choices. Successive previews retain the isolated route, XP and selected gear;
+reset clears only the in-memory demo. Normal index.html saves actual beta progress.
+Use the double-slash GitHub Pages link to avoid the old preview worker scope.
+
+Validation: node tests/journey.cjs covers migration, idempotence, cap, variants,
+backup round-trip and rejection of invalid progress. Actual Chromium at 320×640
+and 390×844 covers home, three arrival scenes, both choices, result actions,
+return home and reload with XP/outfit retained. Real service-worker update test
+retains XP 205, step 2 and the forest backpack, then cold-loads the journey offline
+with new scripts, styles, scenery and cosmetic assets cached. Screenshots inspected
+in /workspace/artifacts/journey13/. Artwork and layout are functional and readable;
+the movement between stops is a short scene transition, not a full walking cycle.
+Production is unchanged. Worker journey-13.

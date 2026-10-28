@@ -6,8 +6,8 @@
     { id: "badge-star", xp: 20, slot: "badge", asset: "star-badge", de: "Stern-Abzeichen", ru: "Значок-звезда" },
     { id: "hat-red", xp: 50, slot: "hat", asset: "red-cap", de: "Rote Kappe", ru: "Красная кепка" },
     { id: "glasses", xp: 90, slot: "glasses", asset: "glasses", de: "Brille", ru: "Очки" },
-    { id: "neck-scarf", xp: 140, slot: "neck", asset: "scarf", de: "Halstuch", ru: "Шарф" },
-    { id: "backpack", xp: 200, slot: "back", asset: "backpack", de: "Rucksack", ru: "Рюкзак" },
+    { id: "neck-scarf", xp: 140, slot: "neck", asset: "scarf-berry", de: "Neues Halstuch", ru: "Новый шарф" },
+    { id: "backpack", xp: 200, slot: "back", asset: "backpack-stars", de: "Neuer Rucksack", ru: "Новый рюкзак" },
     { id: "hat-blue", xp: 280, slot: "hat", asset: "blue-cap", de: "Blaue Kappe", ru: "Синяя кепка" },
     { id: "medal", xp: 380, slot: "badge", asset: "medal", de: "Medaille", ru: "Медаль" },
     { id: "crown", xp: 500, slot: "hat", asset: "crown", de: "Krone", ru: "Корона" }

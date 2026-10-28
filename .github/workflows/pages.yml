@@ -18,6 +18,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Journey persistence and backup checks
+        run: node tests/journey.cjs
       - uses: actions/configure-pages@v5
         with:
           enablement: true
