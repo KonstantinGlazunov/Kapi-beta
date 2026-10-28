@@ -2990,7 +2990,7 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 14 · ПУТЕШЕСТВИЕ</small>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 15 · ПУТЕШЕСТВИЕ</small>
       <p id="previewHelp">Танец → новая остановка → снаряжение → результаты. Три просмотра — путь до озера. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>

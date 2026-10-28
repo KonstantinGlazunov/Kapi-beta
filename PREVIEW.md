@@ -222,3 +222,9 @@ Hide the result screen's travel background during celebrate, restoring it for
 arrival. Chromium at 390×844 confirmed background-image:none during dance and
 the forest scene on arrival. Inspected screenshot: journey13/dance-clean.png.
 Worker journey-14; beta only.
+
+## DEMO 15 — scenery only during arrival
+
+All non-arrival result phases have no travel background and opaque cream cards.
+Chromium checked dance, arrival, gift, choice and summary; only arrival displays
+the scenery. Inspected journey13/summary-clean.png at 390×844. Worker journey-15.
