@@ -209,3 +209,9 @@ with new scripts, styles, scenery and cosmetic assets cached. Screenshots inspec
 in /workspace/artifacts/journey13/. Artwork and layout are functional and readable;
 the movement between stops is a short scene transition, not a full walking cycle.
 Production is unchanged. Worker journey-13.
+
+Published commit 238b08b. Workflow 40643661610 passed journey/backup checks and
+Pages deploy. Public HTTPS double-slash beta URLs matched all 14 checked files
+byte-for-byte, including worker, both HTML pages, JS/CSS, scenery and four new
+item illustrations. Final screenshots also confirm saved equipment and accessible
+home controls at 320 px. No production files were changed.
