@@ -1480,3 +1480,8 @@ body.game-active .game-status { display: none; }
 .result-screen[data-show-phase="gift"] .gift-item { position: relative; inset: auto; width: 160px; height: 160px; object-fit: contain; opacity: 1; transform: none; filter: drop-shadow(0 15px 20px #e3b74855); }
 .result-screen[data-show-phase="gift"] .gift-aura { inset: 35% auto auto 50%; width: 260px; height: 260px; opacity: .65; transform: translate(-50%,-50%); }
 #resultGiftName { position: relative; font-size: 1.5rem; color: var(--teal-dark); }
+
+/* A quiet personal-pace guide: expiration has no gameplay effect. */
+.game-screen > .progress-track { flex-shrink: 0; }
+.pace-track { margin-top: 5px; }
+.pace-fill { width: 100%; transform-origin: left center; transition: none; }

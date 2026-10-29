@@ -228,3 +228,15 @@ Worker journey-14; beta only.
 All non-arrival result phases have no travel background and opaque cream cards.
 Chromium checked dance, arrival, gift, choice and summary; only arrival displays
 the scenery. Inspected journey13/summary-clean.png at 390×844. Worker journey-15.
+
+## DEMO 16 — quiet shrinking pace guide (2026-10-29)
+
+A second matching progress track sits 5 px below session progress. Each problem
+starts full and shrinks right to left over personalFastTime (existing 4-second
+floor before calibration). It freezes on the first answer, resets for the next
+problem and cancels on navigation. No expiry handler, penalty, forced advance,
+numbers or warning colors; learning and scoring rules are unchanged.
+Worker pace-16. Chromium at 320×568 and 390×844 verified track geometry, 5-second
+personal duration, no state change at expiry, accepting a late answer, restart
+and navigation cleanup. Journey/backup checks pass. Screenshots inspected in
+/workspace/artifacts/pace16; fit 9/10, consistency 9/10. Beta only.
