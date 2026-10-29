@@ -275,3 +275,7 @@ Screenshots inspected in /workspace/artifacts/journey24. Fit9/10, visual9/10,
 consistency9/10: distinct rich scenes, compact readable arrival title, character
 and actions remain visible at320px, coherent postcard album. Scene movement is a
 short arrival animation plus ambient effects; no full walking/boat simulation.
+
+Published 3eb1920; Pages workflow40939060593 SUCCESS. Public HTTPS beta verified
+27 files byte-for-byte: HTML/demo, journey/app/style/storage/worker and all20
+WebP scenes. Current beta worker journey-24. Production remains v88.
