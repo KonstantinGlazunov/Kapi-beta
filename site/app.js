@@ -315,7 +315,7 @@
     dismissMotivation();
     $("resultScreen").dataset.showPhase = "summary";
     $("journeyChoice").classList.add("hidden");
-    $("againButton").textContent = journeyCopy()[getProfile().journey.step >= 3 ? "lake" : "home"];
+    $("againButton").textContent = journeyCopy()[getProfile().journey.step >= window.KapiJourney.MAX_STEP ? "lake" : "home"];
     $("skipResultShow").classList.add("hidden");
     $("resultRewardProgress").classList.remove("hidden");
     $("confetti").innerHTML = "";
@@ -602,15 +602,21 @@
   function journeyCopy() { return window.KapiJourney.copy[language]; }
   function setJourneyScene(step) {
     document.body.dataset.journey = String(step);
+    const scene = window.KapiJourney.scene(step);
+    document.body.style.setProperty('--journey-image', `url("assets/journey/${scene.asset}")`);
+    document.body.style.setProperty('--journey-scene-position', scene.position);
+    document.body.style.setProperty('--journey-scene-size', scene.size);
+    document.body.dataset.journeyEffect = ['firefly','ripple','sparkle','butterfly','wave','firefly'][window.KapiJourney.chapter(step)];
     $("resultScreen").dataset.journey = String(step);
   }
   function renderJourneyHome(profile) {
     const step = profile.journey.step, words = journeyCopy();
     setJourneyScene(step);
-    $("journeyTitle").textContent = step === 3 ? words.next[3] : words.title;
+    $("journeyTitle").textContent = window.KapiJourney.chapters[window.KapiJourney.chapter(step)][language === "ru" ? 1 : 2];
+    $("journeyAlbumButton").textContent = `${words.album} · ${step + 1} / 24`;
     $("journeyPlace").textContent = words.places[step];
     $("journeyNext").textContent = words.next[step];
-    $("journeyStops").innerHTML = words.places.map((place, i) => `<span class="${i <= step ? 'reached' : ''}" aria-label="${place}" title="${place}">${i < step ? '✓' : i === step ? '●' : '○'}</span>`).join('<i></i>');
+    $("journeyStops").innerHTML = words.places.slice(window.KapiJourney.chapter(step) * 4, window.KapiJourney.chapter(step) * 4 + 4).map((place, local) => { const i = window.KapiJourney.chapter(step) * 4 + local; return `<span class="${i <= step ? 'reached' : ''}" aria-label="${place}" title="${place}">${i < step ? '✓' : i === step ? '●' : '○'}</span>`; }).join('<i></i>');
     $("startButton").textContent = words.start[step];
     let button = $("journeyGoalButton");
     if (!button) {
@@ -625,6 +631,22 @@
     button.hidden = !window.KapiJourney.variants[next?.id];
     button.textContent = words.goal;
   }
+  function openJourneyAlbum() {
+    const profile = getProfile(), words = journeyCopy(), step = profile.journey.step;
+    const cards = window.KapiJourney.postcards(profile);
+    $("journeyAlbumContent").innerHTML = `<div class="album-header"><h2 id="journeyAlbumTitle">${words.album}</h2><button class="text-button" id="closeJourneyAlbum">${words.close}</button></div><p>${step + 1} / 24 · ${language === 'ru' ? 'Открытки' : 'Postkarten'}: ${cards.length} / 5</p>`  + `<div class="album-postcards">` + [7,11,15,19,23].map(i => {
+      const earned = cards.includes(i), scene = window.KapiJourney.scene(i);
+      return `<figure class="postcard ${earned ? 'earned' : 'locked'}"><div class="album-picture" ${earned ? `style='background-image:url("assets/journey/${scene.asset}");background-size:cover;background-position:center'` : ''}>${earned ? '✉' : '○'}</div><figcaption>${words.places[i]}<small>${earned ? (language === 'ru' ? 'В альбоме' : 'Gesammelt') : (language === 'ru' ? 'После точки ' : 'Nach Ort ') + (i+1)}</small></figcaption></figure>`;
+    }).join('') + `</div>` + window.KapiJourney.chapters.map((chapter, c) => {
+      return `<section class="album-chapter"><h3>${chapter[language === 'ru' ? 1 : 2]} ${c > 0 && cards.includes(c * 4 + 3) ? '✉' : ''}</h3><div class="album-places">` + words.places.slice(c * 4, c * 4 + 4).map((name, n) => {
+        const i = c * 4 + n, scene = window.KapiJourney.scene(i), unlocked = i <= step;
+        return `<figure class="album-place ${unlocked ? 'visited' : 'locked'}"><div class="album-picture" ${unlocked ? `style='background-image:url("assets/journey/${scene.asset}");background-position:${scene.position};background-size:${scene.size}'` : ''}>${unlocked ? '' : '○'}</div><figcaption>${i + 1}. ${name}${i === step ? ' ●' : unlocked ? ' ✓' : ''}</figcaption></figure>`;
+      }).join('') + `</div></section>`;
+    }).join('');
+    $("closeJourneyAlbum").onclick = () => $("journeyAlbum").close();
+    $("journeyAlbum").showModal();
+  }
+
   function renderJourneyWardrobe() {
     const profile = getProfile();
     const holder = document.createElement("div"); holder.className = "journey-wardrobe-variants";
@@ -1446,9 +1468,10 @@ function makePowerProblem(max, mastered) {
 
   function startPaceGuide() {
     paceAnimation?.cancel();
-    // Reuse the personal fast-answer threshold; new profiles start at its
-    // existing four-second floor until the first three answers calibrate it.
-    const seconds = getProfile().personalFastTime ?? UNIVERSAL_FAST_TIME;
+    // Add orientation/reading time to the personal solving-time guide.
+    // This is visual only: calibration, scoring and recorded elapsed stay intact.
+    const seconds = (getProfile().personalFastTime ?? UNIVERSAL_FAST_TIME)
+      + tasks.readingAllowance(state.problem, language);
     paceAnimation = $("paceFill").animate([
       { transform: "scaleX(1)" }, { transform: "scaleX(0)" }
     ], { duration: seconds * 1000, easing: "linear", fill: "forwards" });
@@ -2247,6 +2270,9 @@ function makePowerProblem(max, mastered) {
     if (advanced && chapterBefore?.id !== chapterAfter?.id && chapterAfter) {
       $("resultNote").textContent += ` ${copy.chapterFinished} ${copy.newChapter(chapterAfter[language])}`;
     }
+    if (freshProfile.journey.step > profile.journey.step && window.KapiJourney.postcards(freshProfile).includes(freshProfile.journey.step)) {
+      $("resultNote").textContent += language === "ru" ? " Новая открытка в альбоме!" : " Neue Postkarte im Reisealbum!";
+    }
     renderRewardGoal("result", freshProfile.totalXp);
     $("resultRewardProgress").classList.toggle("hidden", unlocked.length > 0);
     $("weeklyResult").classList.add("hidden");
@@ -2320,8 +2346,16 @@ function makePowerProblem(max, mastered) {
       kapi.reset("result", "idle");
       if (freshProfile.journey.step <= profile.journey.step) { showItems(); return; }
       $("resultScreen").dataset.showPhase = "arrival";
-      $("resultShowTitle").textContent = journeyCopy().arrival[getProfile().journey.step];
-      resultPhaseTimer = window.setTimeout(() => showItems(), 2500);
+      $("resultShowTitle").textContent = journeyCopy().places[getProfile().journey.step];
+      const arrivalStep = getProfile().journey.step;
+      const chapterEnd = arrivalStep >= 7 && arrivalStep % 4 === 3;
+      if (chapterEnd) {
+        const postcardLabel = document.createElement("small");
+        postcardLabel.textContent = journeyCopy().postcard;
+        $("resultShowTitle").appendChild(postcardLabel);
+        $("resultScreen").dataset.chapterCelebration = String(window.KapiJourney.chapter(arrivalStep));
+      } else delete $("resultScreen").dataset.chapterCelebration;
+      resultPhaseTimer = window.setTimeout(() => showItems(), chapterEnd ? 4200 : 2500);
     }, 4000);
   }
 
@@ -3005,8 +3039,8 @@ function makePowerProblem(max, mastered) {
     dialog.className = "preview-dialog";
     dialog.setAttribute("aria-labelledby", "previewTitle");
     dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 15 · ПУТЕШЕСТВИЕ</small>
-      <p id="previewHelp">Танец → новая остановка → снаряжение → результаты. Три просмотра — путь до озера. Без решения заданий. Учебный прогресс не меняется.</p>
+      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 24 · 24 ТОЧКИ</small>
+      <p id="previewHelp">Танец → новая остановка → снаряжение → результаты. 24 точки и 5 новых глав. Выберите остановку для проверки. Без решения заданий. Учебный прогресс не меняется.</p>
       <label id="previewLanguageLabel">Язык / Sprache
         <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
       <label><span id="previewScenarioLabel">Сценарий</span>
@@ -3015,12 +3049,13 @@ function makePowerProblem(max, mastered) {
           <option value="scarf">Новый шарф</option><option value="backpack">Новый рюкзак</option><option value="perfect">Без ошибок</option>
           <option value="regular">Обычное завершение</option>
         </select></label>
+      <label><span id="previewDestinationLabel">Остановка прибытия</span><select id="previewDestination"><option value="auto">По порядку / Der Reihe nach</option></select></label>
       <label class="preview-sound"><input id="previewMotion" type="checkbox" checked><span id="previewMotionLabel">Полная анимация</span></label>
       <label class="preview-sound"><input id="previewSound" type="checkbox" checked><span id="previewSoundLabel">Со звуком</span></label>
       <button id="previewPlay" class="primary-button" type="button">▶ Смотреть</button>
       <button id="previewReset" class="text-button" type="button">Начать маршрут заново / Neu starten</button><p id="previewStatus" role="status" aria-live="polite"></p>`;
     document.body.appendChild(dialog);
-    $("previewReset").onclick = () => { previewMemory.clear(); $("previewStatus").textContent = "0 / 3"; };
+    $("previewReset").onclick = () => { previewMemory.clear(); $("previewStatus").textContent = "0 / 23"; };
     const languageInput = $("previewLanguage");
     const scenarioInput = $("previewScenario");
     const playButton = $("previewPlay");
@@ -3029,8 +3064,12 @@ function makePowerProblem(max, mastered) {
       const ru = languageInput.value === "ru";
       $("previewTitle").textContent = ru ? "Финал тренировки" : "Trainingsabschluss";
       $("previewHelp").textContent = ru
-        ? "Танец → новая остановка → снаряжение → результаты. Три просмотра — путь до озера. Без решения заданий. Учебный прогресс не меняется."
-        : "Tanz → Ankunft → Ausrüstung → Ergebnis. Drei Runden bis zum See. Ohne Aufgaben. Ihr Lernfortschritt bleibt unverändert.";
+        ? "Танец → новая остановка → снаряжение → результаты. 24 точки и 5 новых глав. Выберите остановку для проверки. Без решения заданий. Учебный прогресс не меняется."
+        : "Tanz → Ankunft → Ausrüstung → Ergebnis. 24 Orte und 5 neue Kapitel. Ankunftsort zum Testen wählen. Ohne Aufgaben. Ihr Lernfortschritt bleibt unverändert.";
+      const previousDestination = $("previewDestination").value;
+      $("previewDestinationLabel").textContent = ru ? "Остановка прибытия" : "Ankunftsort";
+      $("previewDestination").innerHTML = `<option value="auto">${ru ? 'По порядку' : 'Der Reihe nach'}</option>` + window.KapiJourney.copy[ru ? 'ru' : 'de'].places.slice(1).map((place,i) => `<option value="${i+1}">${i+2}. ${place}</option>`).join('');
+      $("previewDestination").value = previousDestination || 'auto';
       $("previewScenarioLabel").textContent = ru ? "Сценарий" : "Variante";
       [...scenarioInput.options].forEach((option, index) => {
         option.textContent = (ru ? ["Новый значок", "Новый шарф", "Новый рюкзак", "Без ошибок", "Обычное завершение"]
@@ -3073,6 +3112,7 @@ function makePowerProblem(max, mastered) {
         applyLanguage();
         const profile = getProfile();
         profile.journey = priorProfile.journey;
+        if ($("previewDestination").value !== "auto") profile.journey = {step: Number($("previewDestination").value) - 1, sessions: []};
         profile.cosmeticVariants = priorProfile.cosmeticVariants;
         profile.unlockedRewards = priorProfile.unlockedRewards;
         profile.equippedOutfit = priorProfile.equippedOutfit;
@@ -3168,6 +3208,7 @@ function makePowerProblem(max, mastered) {
     renderWardrobe();
     renderJourneyWardrobe();
   });
+  $("journeyAlbumButton").addEventListener("click", openJourneyAlbum);
   $("journeyPicker").addEventListener("close", () => updateMascotOutfit());
   $("skipResultShow").addEventListener("click", () => { endResultShow(); $("againButton").focus(); });
   $("resultStatsButton").addEventListener("click", showStats);

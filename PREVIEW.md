@@ -240,3 +240,38 @@ Worker pace-16. Chromium at 320×568 and 390×844 verified track geometry, 5-sec
 personal duration, no state change at expiry, accepting a late answer, restart
 and navigation cleanup. Journey/backup checks pass. Screenshots inspected in
 /workspace/artifacts/pace16; fit 9/10, consistency 9/10. Beta only.
+
+## DEMO 24 — 24-stop journey (2026-10-29)
+
+Beta-only expansion: original clearing/bridge/pine/lake + twenty stops in five
+chapters (river, mountains, valley, coast, island). One completed training advances
+one stop; final index23 caps the route. Existing step0–3 profiles continue in place;
+XP, curriculum and clothing remain intact. Session-ID dedup spans all 23 advances.
+Backup validation accepts old and expanded routes. Five postcard unlocks derive
+from completed chapter endpoints7/11/15/19/23, persist through saved journey,
+and appear in an album alongside all 24 destinations. No extra reward currency.
+
+Twenty generated scenes packaged as individual WebP files (about2.5MB total),
+pre-cached for offline use. Home shows four chapter dots and next destination.
+Quiet ambient effects respect reduced motion; milestone arrivals include rainbow,
+flag, lantern sparkle, lighthouse beam or festive sparkle and a postcard marker.
+Arrival lasts2.5s, chapter endpoints4.2s, then normal newly earned clothing/results.
+Reduced motion goes straight to results with postcard notice; album remains usable.
+All non-arrival result backgrounds remain opaque and scenery-free.
+
+Demo result-preview.html?demo=24 has a localized destination selector for testing
+any arrival without altering actual learner storage. Normal beta index persists
+real progress. Beta also includes production v88 glasses, pompom hat (440XP,
+crown stays500XP) and reading-time allowance so the expansion does not regress them.
+Worker beta-20261029-journey-24. Production not changed.
+
+Checks: tests/journey.cjs covers old lake migration,20 completions, dedup,
+incomplete sessions,cap,five postcards, RU/DE and backup validation. Chromium
+320×568/390×844 home and album screenshots; all five milestone arrivals and clean
+summaries; actual saveSession from lake and a chapter endpoint, final cap,
+reduced motion and reload retaining XP. Real service-worker safe update retains
+step19, XP205 and clothing; cold offline launch and all20 scene cache entries pass.
+Screenshots inspected in /workspace/artifacts/journey24. Fit9/10, visual9/10,
+consistency9/10: distinct rich scenes, compact readable arrival title, character
+and actions remain visible at320px, coherent postcard album. Scene movement is a
+short arrival animation plus ambient effects; no full walking/boat simulation.

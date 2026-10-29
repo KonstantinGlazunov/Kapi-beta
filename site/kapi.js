@@ -174,7 +174,7 @@
       this.reducedMotion = motionPreference?.matches === true;
       motionPreference?.addEventListener?.("change", (event) => { this.reducedMotion = event.matches; });
       Object.values(RIG_PARTS).forEach((source) => this.loadImage(source));
-      ["star-badge", "red-cap", "glasses", "scarf", "backpack", "blue-cap", "medal", "crown"].forEach((name) => this.loadImage(`assets/cosmetics/${name}.svg`));
+      ["star-badge", "red-cap", "glasses", "scarf", "backpack", "blue-cap", "medal", "crown", "pompom-hat"].forEach((name) => this.loadImage(`assets/cosmetics/${name}.svg`));
     }
 
     setOutfit(permanent = {}, session = {}) {
@@ -207,7 +207,7 @@
     }
 
     drawCosmetic(context, slot, id, pose, limbs) {
-      if (id === "neck-scarf" || id === "backpack") return; // These designs replace the embedded garment in the torso.
+      if (id === "neck-scarf" || id === "backpack") return; // Recolor the existing garment.
       if (!id || id === "party") return; // The party hat is already part of the horn head.
       const reward = window.KAPI_REWARDS.find((item) => item.id === id);
       const asset = id === "session-star" ? "star-badge" : reward?.asset;
@@ -216,7 +216,8 @@
       if (!entry.ready) return;
       const attachment = this.getAttachmentTransform(slot, pose, limbs);
       const bounds = {
-        hat: [-150, -239, 300, 140], glasses: [-180, -114, 380, 104],
+        hat: id === "hat-pompom" ? [-164, -290, 328, 190] : [-150, -239, 300, 140],
+        glasses: [-174, -135, 335, 160],
         neck: [-122, -216, 245, 165], back: [-325, -170, 170, 220], badge: [82, -45, 85, 90]
       }[slot];
       context.save();
@@ -224,8 +225,6 @@
       context.rotate(slot === "hat" || slot === "glasses" ? limbs.head : 0);
       context.scale(slot === "hat" || slot === "glasses" ? .70 * limbs.headScaleX : .69,
         slot === "hat" || slot === "glasses" ? .70 * limbs.headScaleY : .69);
-      // The face is in three-quarter view: the far eye sits higher.
-      if (slot === "glasses") context.rotate(-.20);
       context.drawImage(entry.image, ...bounds);
       context.restore();
     }
@@ -724,7 +723,8 @@
       if (drawHead) {
         this.drawPart(context, headAsset, 350 + limbs.headX, 190 + limbs.headY, .70, limbs.head, 244, 215, limbs.headScaleX, limbs.headScaleY);
         this.drawCosmetic(context, "hat", outfit.hat, pose, limbs);
-        // Dance artwork already includes star-shaped glasses.
+        // This head artwork already includes star glasses. Check the actual
+        // resolved head so ordinary/continuation/fallback heads keep eyewear.
         if (headAsset !== "headDance") this.drawCosmetic(context, "glasses", outfit.glasses, pose, limbs);
       }
       context.restore();

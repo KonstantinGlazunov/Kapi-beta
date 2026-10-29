@@ -1,17 +1,19 @@
 /* kapi-runtime:v1 — scope-derived URLs and private caches; consumed by /kapi proxy. */
 const CACHE_PREFIX = `kapi:${self.registration.scope}:`;
-const CACHE = `${CACHE_PREFIX}beta-20261029-pace-16`;
+const CACHE = `${CACHE_PREFIX}beta-20261029-journey-24`;
 const SCOPE = new URL(self.registration.scope);
 const LEGACY_PREFIX = SCOPE.pathname === "/kapi/" ? "vibe-kapi-capy-count-beta-" : "capy-count-beta-";
 const ASSETS = ["result-preview.html", "./", "index.html", "styles.css", "kapi.js", "app.js", "manifest.webmanifest", "manifest-ru.webmanifest", "manifest-de.webmanifest", "favicon.svg", "icon-192.png", "icon-512.png", "assets/capybara.webp", "assets/kapi-welcome-sprite.webp", "assets/kapi-flag.webp", "assets/kapi-party.webp", "assets/kapi-dance.webp", "assets/kapi-handshake.webp", "assets/kapi-rig-v2/head.png", "assets/kapi-rig-v2/torso.png", "assets/kapi-rig-v4/arm-left-upper.png", "assets/kapi-rig-v4/arm-left-forearm.png", "assets/kapi-rig-v3/paw-left.png", "assets/kapi-rig-v4/arm-right-upper.png", "assets/kapi-rig-v4/arm-right-forearm.png", "assets/kapi-rig-v3/paw-right.png", "assets/kapi-rig-v5/leg-and-paw.png"];
 
 ASSETS.push("kapi-sound.js", "kapi-motivation.js", "assets/kapi-rig-v2/head-nod.png", "assets/kapi-rig-v2/head-hop.png", "assets/kapi-rig-v2/head-cheer.png", "assets/kapi-rig-v2/head-wrong.png", "assets/kapi-rig-v2/head-recovered.png", "assets/kapi-rig-v2/head-mastered.png", "assets/kapi-rig-v2/head-flag.png", "assets/kapi-rig-v2/head-horn-v2.png", "assets/kapi-rig-v2/arm-right-flag.png", "assets/kapi-rig-v2/head-dance.png", "assets/kapi-rig-v2/head-level.png", "assets/kapi-rig-v2/head-complete.png", "assets/kapi-rig-v2/head-perfect.png");
-ASSETS.push("kapi-rewards.js", ...["star-badge", "red-cap", "glasses", "scarf", "backpack", "blue-cap", "medal", "crown"].map((name) => `assets/cosmetics/${name}.svg`));
+ASSETS.push("kapi-rewards.js", ...["star-badge", "red-cap", "glasses", "scarf", "backpack", "blue-cap", "medal", "crown", "pompom-hat"].map((name) => `assets/cosmetics/${name}.svg`));
 ASSETS.push("kapi-guidance.js", "kapi-storage.js", "kapi-tasks.js", "kapi-map.js", "kapi-weekly.js", "kapi-skills.js", "kapi-mastery.js", "kapi-subskills.js", "kapi-session-planner.js");
 ASSETS.push("assets/home-world.webp", "assets/home-world-wide.webp");
 ASSETS.push("assets/sounds/presentation-music.mp3", "assets/sounds/start.wav", "assets/sounds/correct.wav", "assets/sounds/wrong.wav", "assets/sounds/recovered.wav", "assets/sounds/mastered.wav", "assets/sounds/flag.wav", "assets/sounds/party.wav", "assets/sounds/dance.wav", "assets/sounds/level-up.wav", "assets/sounds/complete-10.wav", "assets/sounds/complete-20.wav", "assets/sounds/complete-30.wav", "assets/sounds/perfect.wav");
 
 ASSETS.push("kapi-journey.js", "journey.css", "assets/journey/forest-route.png", ...["scarf-berry", "scarf-sky", "backpack-stars", "backpack-forest"].map(name => `assets/cosmetics/${name}.svg`));
+
+ASSETS.push(...["river", "mountains", "valley", "coast", "island"].flatMap(name => [0,1,2,3].map(i => `assets/journey/${name}-${i}.webp`)));
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
