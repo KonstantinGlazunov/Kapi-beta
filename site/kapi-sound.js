@@ -26,7 +26,7 @@
   const PRIORITY = { start: 1, correct: 10, wrong: 20, recovered: 30, mastered: 35, flag: 40, speedImproved: 45, party: 50, dance: 60, personalRecord: 70, levelUp: 80, complete10: 90, complete20: 90, complete30: 90, perfect: 95, rewardUnlock: 96 };
   const ALIASES = { streak: "flag", handshake: "levelUp", complete: "complete20" };
   const SAMPLE_SOURCES = {
-    danceMusic: "assets/sounds/presentation-music.mp3",
+    danceMusic: "assets/sounds/dance-music.wav",
     start: "assets/sounds/start.wav",
     correct: "assets/sounds/correct.wav",
     wrong: "assets/sounds/wrong.wav",

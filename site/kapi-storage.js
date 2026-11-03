@@ -1,7 +1,7 @@
 (() => {
   "use strict";
-  const KEYS = { profile: "capy-count-beta-profile-v1", settings: "capy-count-beta-settings-v1", history: "capy-count-beta-history-v1" };
-  const BUNDLE = "capy-count-beta-data-v1";
+  const KEYS = { profile: "capy-count-profile-v1", settings: "capy-count-settings-v1", history: "capy-count-history-v1" };
+  const BUNDLE = "capy-count-data-v1";
   const MAX_BYTES = 2 * 1024 * 1024;
   const object = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
   function safeTree(value, depth = 0) {
@@ -73,11 +73,15 @@
       !Number.isInteger(settings.manualStage) || settings.manualStage < 1 || settings.manualStage > 41 ||
       !Array.isArray(settings.operations) || !settings.operations.length ||
       settings.operations.some((op) => !["add", "subtract", "multiply", "divide", "negative", "decimal", "fraction", "power", "root"].includes(op))) throw new Error("Invalid settings");
+    if (settings.rangeLocked !== undefined && typeof settings.rangeLocked !== "boolean") throw new Error("Invalid range lock");
     for (const item of history) {
       if (!object(item) || typeof item.date !== "string" || !Number.isFinite(Date.parse(item.date)) ||
         !Number.isInteger(item.correct) || ![10, 20, 30].includes(item.total || 20) || item.correct < 0 || item.correct > (item.total || 20) ||
         !Number.isFinite(item.average) || item.average < 0 || !Number.isFinite(item.score) || item.score < 0 ||
         (item.trouble !== undefined && (!Array.isArray(item.trouble) || item.trouble.some((key) => typeof key !== "string")))) throw new Error("Invalid history");
+      if (item.mistakes !== undefined && (!Array.isArray(item.mistakes) || item.mistakes.length > 30 || item.mistakes.some(entry =>
+        !object(entry) || !taskSystem.isValidReviewProblem({ ...entry.problem, correctStreak: 0, lastShown: 0 }) || !Array.isArray(entry.responses) || entry.responses.length > 2 ||
+        entry.responses.some(value => typeof value !== 'string' || value.length > 100)))) throw new Error("Invalid history mistakes");
     }
     return backup.data;
   }
