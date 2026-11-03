@@ -279,3 +279,22 @@ short arrival animation plus ambient effects; no full walking/boat simulation.
 Published 3eb1920; Pages workflow40939060593 SUCCESS. Public HTTPS beta verified
 27 files byte-for-byte: HTML/demo, journey/app/style/storage/worker and all20
 WebP scenes. Current beta worker journey-24. Production remains v88.
+
+## Dynamic mascot — 2026-11-03
+
+Beta is refreshed from the current production application through v103, with
+the dynamic mascot layout prepared as v104. Older beta-only files remain in
+place. Kapi receives the height left after the task, illustration, hint and
+answer controls; counting objects remain enlarged. The previous beta's stored
+progress is preserved by the same scope-based storage and safe worker update.
+Worker: beta-dynamic-mascot-v104.
+
+Checked in Chromium mobile emulation: 320/360/390/430 portrait, detailed
+hints on320/390, and 740×390 landscape with the question and keypad visible.
+Same exercise 2+1 on390×844: mascot container52px before and422px after,
+then211px with keypad; hint yields space while choices keep their positions.
+Screenshots inspected: /workspace/artifacts/dynamic104/{before,after,hint,
+keypad,landscape}.png. Fit9/10, visual9/10, design9/10: Kapi fills unused
+space without clipping, equation and controls remain clear. Safe worker update
+from the prior beta worker tested on root and /kapi/ with stored profile,
+offline, backup and multi-tab checks; PASS. No physical phone tested.

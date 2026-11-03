@@ -2,30 +2,18 @@
 (() => {
   "use strict";
 
-  // This separate preview never reads or writes the learner's browser storage.
-  const resultPreview = window.location.pathname.endsWith("/result-preview.html") ||
-    new URLSearchParams(window.location.search).get("resultPreview") === "1";
-  let previewFullMotion = false;
-  const reduceResultMotion = () => resultPreview ? !previewFullMotion :
-    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
-  const previewMemory = resultPreview ? new Map() : null;
-  const previewStorage = resultPreview ? {
-    getItem: (key) => previewMemory.get(key) ?? null,
-    setItem: (key, value) => previewMemory.set(key, String(value)),
-    removeItem: (key) => previewMemory.delete(key)
-  } : null;
-  const storage = window.KapiStorage.create(() => resultPreview ? previewStorage : window.localStorage, () => {
+  const storage = window.KapiStorage.create(() => window.localStorage, () => {
     const notice = document.getElementById("storageNotice");
     if (notice) { notice.hidden = false; notice.textContent = copy.storageWarning; }
   });
   let TOTAL = 20;
-  const HISTORY_KEY = "capy-count-beta-history-v1";
-  const SETTINGS_KEY = "capy-count-beta-settings-v1";
-  const PROFILE_KEY = "capy-count-beta-profile-v1";
-  const INSTALL_DISMISS_KEY = "capy-count-beta-install-dismissed-v1";
-  const INSTALLED_KEY = "capy-count-beta-installed-v1";
+  const HISTORY_KEY = "capy-count-history-v1";
+  const SETTINGS_KEY = "capy-count-settings-v1";
+  const PROFILE_KEY = "capy-count-profile-v1";
+  const INSTALL_DISMISS_KEY = "capy-count-install-dismissed-v1";
+  const INSTALLED_KEY = "capy-count-installed-v1";
   let language = "de";
-  const APP_URL = "https://konstantinglazunov.github.io/Kapi-beta";
+  const APP_URL = "https://erstellen-websiten.de/kapi";
   const INVITE_URL = `${APP_URL}/?install=1`;
   const UNIVERSAL_FAST_TIME = 4;
   const PERSONAL_RECORD_MIN_RATIO = .10;
@@ -51,13 +39,13 @@
   const CORE_DIVISORS = [1, 2, 10, 5];
   const DERIVED_DIVISORS = [4, 3, 9, 6, 8, 7];
   const STAGE_EXAMPLES = ["● ● ●", "3 + 1", "2 + 3", "6 + 4", "4 + 5", "5 − 1", "9 − 3", "6 + 3 / 8 − 4", "10 + 7", "12 + 3", "18 − 4", "8 + 5", "13 − 5", "16 − 7 / 7 + 8", "42 + 10", "34 + 23", "37 + 25", "63 − 27", "3 + 3 + 3", "5 × 2", "12 : 3", "20 : 5", "7 × 8", "42 : 6 / 6 × 7", "340 + 220", "478 − 195", "3 400 + 2 100", "6 302 − 2 748", "48 000 ÷ 600", "7²", "1/4 + 2/4", "2/3 + 1/6", "3/4 × 2/5", "2,4 + 1,7", "3,6 ÷ 0,6", "4 − 9", "−6 × 3", "2⁵", "√144", "∛125", "3³ / √81"];
-  const appSettings = { language: "de", problemCount: 20, automatic: true, range: "above100", operations: [...OPERATION_ORDER], manualStage: 1, sound: true, curriculumVersion: CURRICULUM_VERSION };
+  const appSettings = { language: "de", problemCount: 10, automatic: true, range: "above100", operations: [...OPERATION_ORDER], manualStage: 1, sound: true, curriculumVersion: CURRICULUM_VERSION };
   const translations = {
     ru: {
       locale: "ru-RU", appName: "Считаем с Капи", description: "Адаптивный тренажёр арифметики для детей — от сложения до корней.",
       startEyebrow: "Уровень 1", startTitle: "Готовы считать?", startDescription: "20 коротких примеров. Капи постепенно повышает сложность.",
-      homeSubtitle: "Шаг за шагом с Капи.", homeHistory: "История", homeXp: "XP", homeStage: (stage) => `Ступень ${stage}`,
-      dayStreak: "дней подряд", totalXp: "всего XP", start: "Начать тренировку", history: "История занятий", speech: "Hey!",
+      homeSubtitle: "Шаг за шагом с Капи.", homeHistory: "История", homeXp: "Очки", homeStage: (stage) => `Ступень ${stage}`,
+      dayStreak: "дней подряд", totalXp: "всего очков", start: "Начать тренировку", history: "История занятий", speech: "Hey!",
       homeGreetings: ["Привет! Начнём?", "Поехали!", "Продолжим!", "Рад тебя видеть!"],
       weeklyGoal: "Цель на неделю", thisWeek: "На этой неделе", weeklyZero: "Первое занятие ждёт",
       weeklyCount: (count, goal) => `${count} из ${goal} тренировок`,
@@ -110,8 +98,8 @@
     de: {
       locale: "de-DE", appName: "Rechnen mit Kapi", description: "Adaptives Rechentraining für Kinder – von Addition bis zu Wurzeln.",
       startEyebrow: "Stufe 1", startTitle: "Bereit zum Rechnen?", startDescription: "20 kurze Aufgaben. Kapi erhöht die Schwierigkeit Schritt für Schritt.",
-      homeSubtitle: "Schritt für Schritt mit Kapi.", homeHistory: "Verlauf", homeXp: "XP", homeStage: (stage) => `Stufe ${stage}`,
-      dayStreak: "Tage in Folge", totalXp: "XP insgesamt", start: "Training starten", history: "Trainingsverlauf", speech: "Hey!",
+      homeSubtitle: "Schritt für Schritt mit Kapi.", homeHistory: "Verlauf", homeXp: "Punkte", homeStage: (stage) => `Stufe ${stage}`,
+      dayStreak: "Tage in Folge", totalXp: "Punkte insgesamt", start: "Training starten", history: "Trainingsverlauf", speech: "Hey!",
       homeGreetings: ["Hallo! Bereit?", "Los geht’s!", "Weiter geht’s!", "Schön, dass du da bist!"],
       weeklyGoal: "Wochenziel", thisWeek: "Diese Woche", weeklyZero: "Erstes Training wartet",
       weeklyCount: (count, goal) => `${count} von ${goal} Trainings`,
@@ -188,11 +176,16 @@
     hintLookAgain: "Schau noch einmal genau hin.", hintRemaining: "Was bleibt übrig?",
     speedImprovedTitle: "Du wirst schneller!", personalRecordTitle: "Neuer Rekord!"
   });
+  function pointCount(n, lang = language) {
+    const count = Math.abs(Number(n)), mod100 = count % 100, mod10 = count % 10;
+    const word = lang === 'de' ? (count === 1 ? 'Punkt' : 'Punkte') : mod100 >= 11 && mod100 <= 14 ? 'очков' : mod10 === 1 ? 'очко' : mod10 >= 2 && mod10 <= 4 ? 'очка' : 'очков';
+    return `${n} ${word}`;
+  }
   Object.assign(translations.de, {
     meinKapi: "Mein Kapi", wardrobeIntro: "Für deinen Fortschritt bekommt Kapi neue Sachen.",
     wardrobeSlots: { hat: "Kopfbedeckung", glasses: "Brille", neck: "Hals", back: "Rücken", badge: "Abzeichen" },
-    noItem: "Ohne", selected: "Ausgewählt", unlocked: "Freigeschaltet", locked: (xp) => `🔒 ${xp} XP`,
-    xpGoal: (xp, target) => `${xp} / ${target} XP`, nextGoal: (remaining, name) => `Noch ${remaining} XP bis ${name}`,
+    noItem: "Ohne", selected: "Ausgewählt", unlocked: "Freigeschaltet", locked: (xp) => `🔒 ${pointCount(xp, "de")}`,
+    xpGoal: (xp, target) => `${xp} / ${pointCount(target, "de")}`, nextGoal: (remaining, name) => `Noch ${pointCount(remaining, "de")} bis zur Belohnung „${name}“`,
     firstReward: "Erstes Abzeichen wartet!", allRewards: "Alle Kapi-Sachen freigeschaltet!",
     newThings: (count) => count === 1 ? "Neu für Kapi!" : `${count} neue Sachen für Kapi!`,
     rewardUnlocked: "freigeschaltet", nextTarget: "Nächstes Ziel"
@@ -200,8 +193,8 @@
   Object.assign(translations.ru, {
     meinKapi: "Мой Капи", wardrobeIntro: "За твои успехи Капи получает новые вещи.",
     wardrobeSlots: { hat: "Головной убор", glasses: "Очки", neck: "Шея", back: "Спина", badge: "Значок" },
-    noItem: "Без предмета", selected: "Выбрано", unlocked: "Открыто", locked: (xp) => `🔒 ${xp} XP`,
-    xpGoal: (xp, target) => `${xp} / ${target} XP`, nextGoal: (remaining, name) => `Ещё ${remaining} XP до ${name}`,
+    noItem: "Без предмета", selected: "Выбрано", unlocked: "Открыто", locked: (xp) => `🔒 ${pointCount(xp, "ru")}`,
+    xpGoal: (xp, target) => `${xp} / ${pointCount(target, "ru")}`, nextGoal: (remaining, name) => `До ${name === "Значок-звезда" ? "значка «Звезда»" : `награды «${name}»`} осталось ${pointCount(remaining, "ru")}`,
     firstReward: "Первый значок уже ждёт!", allRewards: "Все предметы Капи открыты!",
     newThings: (count) => count === 1 ? "Новинка для Капи!" : `${count} новых предмета для Капи!`,
     rewardUnlocked: "открыт", nextTarget: "Следующая цель"
@@ -269,6 +262,9 @@
   let deferredInstallPrompt = null;
   let installPlatform = "android";
   let settingsSection = "menu";
+  let settingsRenderedSection = null;
+  let advancedSettingsOpen = false;
+  let settingsNotice = "";
 
   const state = {
     index: 0,
@@ -286,6 +282,7 @@
     stageAdvancedDuringSession: false
   };
 
+  const reduceResultMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (id) => document.getElementById(id);
   const screens = [$("startScreen"), $("stageIntroScreen"), $("gameScreen"), $("resultScreen")];
   let stageIntroTimer;
@@ -295,15 +292,18 @@
   let motivation = null;
   let soundManager = null;
   let advanceTimer = 0;
+  let autoAnswerTimer = 0;
   let solutionTimer = 0;
   let rewardRevealTimer = 0;
   let rewardGoalTimer = 0;
   let resultShowTimer = 0;
   let resultPhaseTimer = 0;
+  let continueArrival = null;
   let resultGiftAnimations = [];
   let revealResultReward = null;
 
   function endResultShow(keepMusic = false) {
+    continueArrival = null;
     resultGiftAnimations.forEach((animation) => animation.cancel());
     resultGiftAnimations = [];
     window.clearTimeout(resultShowTimer);
@@ -315,7 +315,7 @@
     dismissMotivation();
     $("resultScreen").dataset.showPhase = "summary";
     $("journeyChoice").classList.add("hidden");
-    $("againButton").textContent = journeyCopy()[getProfile().journey.step >= window.KapiJourney.MAX_STEP ? "lake" : "home"];
+    $("againButton").textContent = language === "ru" ? "На главную" : "Zur Startseite";
     $("skipResultShow").classList.add("hidden");
     $("resultRewardProgress").classList.remove("hidden");
     $("confetti").innerHTML = "";
@@ -328,7 +328,7 @@
     copy = translations[language];
     messages = copy.messages;
     document.documentElement.lang = language;
-    document.title = `${copy.appName} · BETA`;
+    document.title = copy.appName;
     document.querySelector('meta[name="description"]').setAttribute("content", copy.description);
     $("manifestLink").setAttribute("href", `manifest-${language}.webmanifest`);
     $("brandName").textContent = copy.appName;
@@ -337,7 +337,6 @@
     $("weeklyLabel").textContent = copy.thisWeek;
     $("totalXpLabel").textContent = copy.homeXp;
     $("startButton").innerHTML = `<span class="home-start-icon" aria-hidden="true">▶</span> ${copy.start}`;
-    $("statsButton").textContent = copy.homeHistory;
     $("wardrobeButton").textContent = copy.meinKapi;
     $("mapButton").textContent = copy.learningPath;
     $("mapTitle").textContent = copy.learningPath;
@@ -359,7 +358,7 @@
     $("problemTotal").textContent = String(TOTAL);
     $("correctLabel").textContent = copy.correctOfTotal(TOTAL);
     $("averageLabel").textContent = copy.average;
-    $("xpLabel").textContent = copy.experience;
+    $("xpLabel").textContent = language === "ru" ? "за занятие" : "für die Übung";
     $("againButton").textContent = copy.again;
     $("shareButton").textContent = copy.share;
     $("resultStatsButton").textContent = copy.viewHistory;
@@ -391,9 +390,10 @@
     try {
       const value = storage.readJSON(SETTINGS_KEY, {});
       appSettings.language = ["ru", "de"].includes(value.language) ? value.language : defaultLanguage;
-      appSettings.problemCount = [10, 20, 30].includes(Number(value.problemCount)) ? Number(value.problemCount) : 20;
+      appSettings.problemCount = [10, 20, 30].includes(Number(value.problemCount)) ? Number(value.problemCount) : 10;
       const currentCurriculum = value.curriculumVersion === CURRICULUM_VERSION;
       appSettings.automatic = value.automatic !== false;
+      appSettings.rangeLocked = value.rangeLocked === true;
       appSettings.range = ["10", "20", "100", "above100"].includes(String(value.range)) ? String(value.range) : "above100";
       appSettings.operations = Array.isArray(value.operations)
         ? OPERATION_ORDER.filter((operation) => value.operations.includes(operation))
@@ -416,12 +416,32 @@
   }
 
   function renderSettingsContent() {
+    const active = document.activeElement;
+    const identity = active && { name: active.name, value: active.value, id: active.id };
+    const advanced = $("settingsContent").querySelector("details.settings-advanced");
+    if (advanced) advancedSettingsOpen = advanced.open;
+    const changed = settingsRenderedSection !== settingsSection;
+    renderSettingsBody();
+    settingsRenderedSection = settingsSection;
+    if (!$("settingsDialog").open) return;
+    if (!changed && identity) {
+      const replacement = [...$("settingsContent").querySelectorAll('input,select,button')].find(el => identity.id ? el.id === identity.id : identity.name && el.name === identity.name && (el.tagName === 'SELECT' || el.value === identity.value));
+      if (replacement) { replacement.focus({preventScroll:true}); return; }
+    }
+    const heading = $("settingsContent").querySelector('h3');
+    if (heading) { heading.tabIndex = -1; heading.focus(); }
+    else $("settingsContent").querySelector('button')?.focus();
+  }
+
+  function renderSettingsBody() {
     const content = $("settingsContent");
     if (!content) return;
     $("settingsHint").hidden = settingsSection !== "menu";
     const items = [
       ["counting", "±", copy.settingsCounting, copy.settingsCountingMenu],
       ["general", "A", copy.settingsGeneral, copy.settingsGeneralMenu],
+      ["data", "⇄", language === "ru" ? "Данные и перенос" : "Daten und Umzug", copy.backupHelp],
+      ["history", "◷", copy.homeHistory, language === "ru" ? "Результаты прошлых тренировок" : "Ergebnisse vergangener Trainings"],
       ["about", "i", copy.settingsAbout, copy.settingsAboutMenu]
     ];
     if (settingsSection === "menu") {
@@ -436,12 +456,6 @@
       const selectedWeeklyGoal = getProfile().weeklyGoal;
       content.innerHTML = `${navigation}
         <section class="settings-panel">
-          <fieldset class="backup-controls"><legend>${copy.backupTitle}</legend>
-            <p class="settings-note">${copy.backupHelp}</p>
-            <button class="setting-toggle" type="button" data-backup-export>${copy.backupExport}</button>
-            <label class="backup-file">${copy.backupImport}<input type="file" data-backup-import accept="application/json,.json"></label>
-            <p id="backupStatus" role="status"></p>
-          </fieldset>
           <fieldset><legend>${copy.language}</legend>
             <label><input type="radio" name="language" value="de" ${language === "de" ? "checked" : ""}> Deutsch</label>
             <label><input type="radio" name="language" value="ru" ${language === "ru" ? "checked" : ""}> Русский</label>
@@ -453,6 +467,16 @@
             ${weekly.GOALS.map((goal) => `<label><input type="radio" name="weeklyGoal" value="${goal}" ${selectedWeeklyGoal === goal ? "checked" : ""}> ${copy.weeklyOption(goal)}</label>`).join("")}
           </fieldset>
         </section>`;
+      return;
+    }
+    if (settingsSection === "data") {
+      content.innerHTML = `${navigation}<section class="settings-panel">          <fieldset class="backup-controls"><legend>${copy.backupTitle}</legend>
+            <p class="settings-note">${copy.backupHelp}</p>
+            <button class="setting-toggle" type="button" data-backup-export>${copy.backupExport}</button>
+            <label class="backup-file">${copy.backupImport}<input type="file" data-backup-import accept="application/json,.json"></label>
+            <p id="backupStatus" role="status"></p>
+          </fieldset>
+</section>`;
       return;
     }
     if (settingsSection === "about") {
@@ -469,41 +493,29 @@
         </section>`;
       return;
     }
-    const profile = getProfile();
-    const maxStage = maximumAllowedStage();
-    const selectableStageCount = appSettings.automatic ? maxStage : CURRICULUM_STAGE_COUNT;
-    const selectedStage = Math.min(selectableStageCount, appSettings.automatic ? profile.currentStage : appSettings.manualStage);
-    if (appSettings.automatic && profile.currentStage !== selectedStage) {
-      profile.currentStage = selectedStage;
-      saveProfile(profile);
-    }
-    appSettings.manualStage = selectedStage;
-    const stageIndex = selectedStage - 1;
-    content.innerHTML = `${navigation}
-      <section class="settings-panel">
-        <fieldset><legend>${copy.examples}</legend>
-          ${[10, 20, 30].map((count) => `<label><input type="radio" name="problemCount" value="${count}" ${TOTAL === count ? "checked" : ""}> ${count}</label>`).join("")}
-        </fieldset>
-        <fieldset><legend>${copy.mode}</legend>
-          <label class="setting-wide"><input type="checkbox" name="automatic" ${appSettings.automatic ? "checked" : ""}> ${copy.automatic}</label>
-          ${appSettings.automatic ? `<p class="settings-note">${copy.automaticHint}</p>` : ""}
-        </fieldset>
-        <fieldset><legend>${copy.range}</legend>
-          ${[["10", copy.rangeNames[10]], ["20", copy.rangeNames[20]], ["100", copy.rangeNames[100]], ["above100", copy.rangeNames.above100]].map(([value, label]) => `<label><input type="radio" name="range" value="${value}" ${appSettings.range === value ? "checked" : ""}> ${label}</label>`).join("")}
-        </fieldset>
-        <fieldset class="stage-settings"><legend>${appSettings.automatic ? copy.startStage : copy.chooseStage}</legend>
-            <select name="manualStage" aria-label="${appSettings.automatic ? copy.startStage : copy.chooseStage}">${Array.from({ length: selectableStageCount }, (_, index) => `<option value="${index + 1}" ${selectedStage === index + 1 ? "selected" : ""}>${index + 1}. ${copy.stageNames[index]}</option>`).join("")}</select>
-            <div class="stage-summary"><span>${copy.stageBrief(copy.stageNames[stageIndex], STAGE_EXAMPLES[stageIndex])}</span><details><summary aria-label="${copy.stageInfo}" title="${copy.stageInfo}">i</summary><p>${copy.stageDetail(appSettings.manualStage, copy.stageNames[stageIndex], STAGE_EXAMPLES[stageIndex])}</p></details></div>
-        </fieldset>
-        <fieldset class="operation-settings"><legend>${copy.operations}</legend>
-            ${appSettings.automatic ? `<p class="settings-note">${copy.operationsAutomatic}</p>` : ""}
-            ${OPERATION_ORDER.map((operation) => {
-              const available = operationAvailableAtStage(operation, selectedStage);
-              const checked = appSettings.automatic ? available : appSettings.operations.includes(operation);
-              return `<label class="${available ? "" : "operation-locked"}"><input type="checkbox" name="operation" value="${operation}" ${checked ? "checked" : ""} ${(appSettings.automatic || !available) ? "disabled" : ""}> ${copy.operationNames[operation]}</label>`;
-            }).join("")}
-        </fieldset>
-      </section>`;
+    const ru = language === 'ru', profile = getProfile();
+    const selectedStage = appSettings.automatic ? profile.currentStage : appSettings.manualStage;
+    const limit = appSettings.rangeLocked ? maximumAllowedStage() : CURRICULUM_STAGE_COUNT;
+    const chapters = curriculumMap.getChapters().filter(c => c.first <= limit);
+    const chosenChapter = curriculumMap.chapterForStage(selectedStage);
+    const rangeHint = ru ? 'Для выбранной темы диапазон:' : 'Zahlenraum für das gewählte Thema:';
+    content.innerHTML = `${navigation}<section class="settings-panel">
+      <fieldset><legend>${ru ? 'Как заниматься?' : 'Wie möchtest du üben?'}</legend>
+        <label class="setting-wide"><input type="radio" name="automatic" value="auto" ${appSettings.automatic ? 'checked' : ''}>${ru ? 'Подбирай задания сам' : 'Aufgaben automatisch auswählen'}</label>
+        <label class="setting-wide"><input type="radio" name="automatic" value="manual" ${!appSettings.automatic ? 'checked' : ''}>${ru ? 'Хочу потренировать тему' : 'Ich möchte ein Thema üben'}</label>
+      </fieldset>
+      ${appSettings.automatic ? `<p class="settings-note">${copy.automaticHint}</p>` : `<label class="topic-picker">${ru ? 'Тема' : 'Thema'}<select name="topic">${chapters.map(c => `<option value="${c.first}" ${c.id === chosenChapter?.id ? 'selected' : ''}>${c[language]}${!appSettings.rangeLocked && rangeForStage(c.first) !== appSettings.range ? " — " + (ru ? "диапазон изменится на " : "Zahlenraum wechselt zu ") + copy.rangeNames[rangeForStage(c.first)] : ""}</option>`).join('')}</select></label>
+        <p class="topic-example"><strong>${copy.stageNames[selectedStage-1]}</strong><br>${STAGE_EXAMPLES[selectedStage-1]}</p>
+        <p class="settings-note">${rangeHint} ${copy.rangeNames[rangeForStage(selectedStage)]}. ${ru ? 'Выбор другой темы может изменить диапазон. Жёсткую границу можно задать ниже.' : 'Ein anderes Thema kann den Zahlenraum ändern. Eine feste Grenze lässt sich unten setzen.'}</p>`}
+      <p id="settingsNotice" role="status">${settingsNotice}</p>
+      <details class="settings-advanced" ${advancedSettingsOpen ? 'open' : ''}><summary>${ru ? 'Дополнительные параметры' : 'Weitere Einstellungen'}</summary>
+        <fieldset><legend>${copy.examples}</legend>${[10,20,30].map(n=>`<label><input type="radio" name="problemCount" value="${n}" ${appSettings.problemCount===n?'checked':''}>${n}</label>`).join('')}</fieldset>
+        <fieldset><legend>${copy.range}</legend>${['10','20','100','above100'].map(value=>`<label><input type="radio" name="range" value="${value}" ${appSettings.range===value?'checked':''}>${copy.rangeNames[value]}</label>`).join('')}
+        <label class="setting-wide"><input type="checkbox" name="rangeLocked" ${appSettings.rangeLocked?'checked':''}>${ru?'Не выходить за выбранный диапазон':'Diesen Zahlenraum nicht überschreiten'}</label></fieldset>
+        <fieldset class="stage-settings"><legend>${copy.chooseStage}</legend><select name="manualStage" aria-label="${copy.chooseStage}">${Array.from({length:limit},(_,i)=>`<option value="${i+1}" ${selectedStage===i+1?'selected':''}>${i+1}. ${copy.stageNames[i]}${!appSettings.rangeLocked&&rangeForStage(i+1)!==appSettings.range?' — '+copy.rangeNames[rangeForStage(i+1)]:''}</option>`).join('')}</select>
+        <p>${STAGE_EXAMPLES[selectedStage-1]}</p></fieldset>
+        <fieldset class="operation-settings"><legend>${copy.operations}</legend><p class="settings-note">${ru?'Действия доступны для выбранной темы. Должно остаться хотя бы одно.':'Rechenarten hängen vom Thema ab. Mindestens eine muss ausgewählt bleiben.'}</p>${OPERATION_ORDER.map(operation=>{const available=operationAvailableAtStage(operation,selectedStage);return `<label><input type="checkbox" name="operation" value="${operation}" ${appSettings.automatic?available?'checked':'':appSettings.operations.includes(operation)?'checked':''} ${appSettings.automatic||!available?'disabled':''}>${copy.operationNames[operation]}</label>`}).join('')}</fieldset>
+      </details></section>`;
   }
 
   function getProfile() {
@@ -612,12 +624,18 @@
   function renderJourneyHome(profile) {
     const step = profile.journey.step, words = journeyCopy();
     setJourneyScene(step);
-    $("journeyTitle").textContent = window.KapiJourney.chapters[window.KapiJourney.chapter(step)][language === "ru" ? 1 : 2];
-    $("journeyAlbumButton").textContent = `${words.album} · ${step + 1} / 24`;
-    $("journeyPlace").textContent = words.places[step];
-    $("journeyNext").textContent = words.next[step];
+    $("journeyTitle").textContent = words.places[Math.min(step + 1, window.KapiJourney.MAX_STEP)];
+    $("journeyAlbumButton").textContent = words.album;
+    $("journeyAlbumButton").setAttribute("aria-label", `${words.album} · ${step + 1} / 24`);
+    $("journeyPlace").textContent = (language === "ru" ? "Сейчас: " : "Jetzt: ") + words.places[step];
+    $("journeyNext").textContent = step < window.KapiJourney.MAX_STEP ? (language === "ru" ? "После завершённого занятия" : "Nach einer abgeschlossenen Übung") : words.next[step];
     $("journeyStops").innerHTML = words.places.slice(window.KapiJourney.chapter(step) * 4, window.KapiJourney.chapter(step) * 4 + 4).map((place, local) => { const i = window.KapiJourney.chapter(step) * 4 + local; return `<span class="${i <= step ? 'reached' : ''}" aria-label="${place}" title="${place}">${i < step ? '✓' : i === step ? '●' : '○'}</span>`; }).join('<i></i>');
-    $("startButton").textContent = words.start[step];
+    const first = profile.totalXp === 0 && getHistory().length === 0 && step === 0;
+    $("startButton").textContent = first ? (language === 'ru' ? 'Начать первое занятие' : 'Erste Übung starten') : (language === 'ru' ? 'Начать следующее занятие' : 'Nächste Übung starten');
+    document.body.classList.toggle("first-visit", first);
+    $("homeFirstHint").hidden = !first;
+    $("homeFirstHint").textContent = language === 'ru' ? 'Решай примеры и путешествуй с Капи' : 'Löse Aufgaben und reise mit Kapi';
+    $("homeTaskCount").textContent = language === 'ru' ? `${appSettings.problemCount} заданий` : `${appSettings.problemCount} Aufgaben`;
     let button = $("journeyGoalButton");
     if (!button) {
       button = document.createElement("button"); button.id = "journeyGoalButton"; button.className = "text-button";
@@ -631,36 +649,108 @@
     button.hidden = !window.KapiJourney.variants[next?.id];
     button.textContent = words.goal;
   }
-  function openJourneyAlbum() {
-    const profile = getProfile(), words = journeyCopy(), step = profile.journey.step;
-    const cards = window.KapiJourney.postcards(profile);
-    $("journeyAlbumContent").innerHTML = `<div class="album-header"><h2 id="journeyAlbumTitle">${words.album}</h2><button class="text-button" id="closeJourneyAlbum">${words.close}</button></div><p>${step + 1} / 24 · ${language === 'ru' ? 'Открытки' : 'Postkarten'}: ${cards.length} / 5</p>`  + `<div class="album-postcards">` + [7,11,15,19,23].map(i => {
-      const earned = cards.includes(i), scene = window.KapiJourney.scene(i);
-      return `<figure class="postcard ${earned ? 'earned' : 'locked'}"><div class="album-picture" ${earned ? `style='background-image:url("assets/journey/${scene.asset}");background-size:cover;background-position:center'` : ''}>${earned ? '✉' : '○'}</div><figcaption>${words.places[i]}<small>${earned ? (language === 'ru' ? 'В альбоме' : 'Gesammelt') : (language === 'ru' ? 'После точки ' : 'Nach Ort ') + (i+1)}</small></figcaption></figure>`;
-    }).join('') + `</div>` + window.KapiJourney.chapters.map((chapter, c) => {
-      return `<section class="album-chapter"><h3>${chapter[language === 'ru' ? 1 : 2]} ${c > 0 && cards.includes(c * 4 + 3) ? '✉' : ''}</h3><div class="album-places">` + words.places.slice(c * 4, c * 4 + 4).map((name, n) => {
-        const i = c * 4 + n, scene = window.KapiJourney.scene(i), unlocked = i <= step;
-        return `<figure class="album-place ${unlocked ? 'visited' : 'locked'}"><div class="album-picture" ${unlocked ? `style='background-image:url("assets/journey/${scene.asset}");background-position:${scene.position};background-size:${scene.size}'` : ''}>${unlocked ? '' : '○'}</div><figcaption>${i + 1}. ${name}${i === step ? ' ●' : unlocked ? ' ✓' : ''}</figcaption></figure>`;
-      }).join('') + `</div></section>`;
-    }).join('');
-    $("closeJourneyAlbum").onclick = () => $("journeyAlbum").close();
-    $("journeyAlbum").showModal();
+  if (window.history?.state?.kapiAlbumDepth) window.history.replaceState({ ...window.history.state, kapiAlbumDepth: 0 }, "");
+  const albumLayers = [];
+  const backClosing = new WeakSet();
+  function openAlbumLayer(dialog) {
+    if (dialog.open) return;
+    albumLayers.push(dialog);
+    window.history.pushState({ ...window.history.state, kapiAlbumDepth: albumLayers.length }, '');
+    dialog.showModal();
+  }
+  for (const id of ['journeyAlbum', 'journeyViewer']) {
+    $(id).addEventListener('close', () => {
+      if (backClosing.has($(id))) { backClosing.delete($(id)); return; }
+      const index = albumLayers.indexOf($(id));
+      if (index < 0) return;
+      albumLayers.splice(index, 1);
+      window.history.back();
+    });
+  }
+  window.addEventListener('popstate', event => {
+    const depth = Math.max(0, Math.min(albumLayers.length, Number(event.state?.kapiAlbumDepth) || 0));
+    while (albumLayers.length > depth) {
+      const dialog = albumLayers.pop(); backClosing.add(dialog); dialog.close();
+    }
+  });
+
+  function albumViewButton(step, name, available) {
+    if (!available) return '';
+    const label = (language === 'ru' ? 'Рассмотреть: ' : 'Ansehen: ') + name;
+    return `<button class="album-open" type="button" data-album-view="${step}" aria-label="${label}"><span aria-hidden="true">⤢</span></button>`;
   }
 
-  function renderJourneyWardrobe() {
-    const profile = getProfile();
-    const holder = document.createElement("div"); holder.className = "journey-wardrobe-variants";
-    for (const id of Object.keys(window.KapiJourney.variants)) {
-      if (!profile.unlockedRewards.includes(id)) continue;
-      const button = document.createElement("button"); button.className = "share-button";
-      button.textContent = window.KapiJourney.variant(profile, id)[language] + ' · ' + journeyCopy().goal;
-      button.onclick = () => openJourneyPicker(id);
-      holder.append(button);
-    }
-    $("wardrobeItems").append(holder);
+  function openJourneyViewer(step, trigger) {
+    if (!Number.isInteger(step) || step < 0 || step > getProfile().journey.step) return;
+    const viewer = $("journeyViewer"), scroller = $("journeyAlbumContent").querySelector('.album-scroll');
+    const scrollTop = scroller.scrollTop;
+    const steps = Array.from({length: getProfile().journey.step + 1}, (_, i) => i);
+    let index = steps.indexOf(step);
+    const image = $("journeyViewerImage");
+    const render = () => {
+      const name = journeyCopy().places[steps[index]];
+      $("journeyViewerTitle").textContent = name;
+      image.alt = name;
+      image.src = `assets/journey/${window.KapiJourney.scene(steps[index]).asset}`;
+      $("journeyViewerCount").textContent = `${index + 1} / ${steps.length}`;
+      $("journeyViewerPrevious").disabled = index === 0;
+      $("journeyViewerNext").disabled = index === steps.length - 1;
+    };
+    const move = direction => {
+      const next = Math.max(0, Math.min(steps.length - 1, index + direction));
+      if (next !== index) { index = next; render(); }
+    };
+    const ru = language === 'ru';
+    $("journeyViewerPrevious").setAttribute('aria-label', ru ? 'Предыдущая картинка' : 'Vorheriges Bild');
+    $("journeyViewerNext").setAttribute('aria-label', ru ? 'Следующая картинка' : 'Nächstes Bild');
+    $("journeyViewerPrevious").onclick = () => move(-1);
+    $("journeyViewerNext").onclick = () => move(1);
+    viewer.onkeydown = event => {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault(); move(event.key === 'ArrowLeft' ? -1 : 1);
+      }
+    };
+    let touch = null;
+    image.ontouchstart = event => {
+      touch = event.touches.length === 1
+        ? {x: event.touches[0].clientX, y: event.touches[0].clientY} : null;
+    };
+    image.ontouchmove = event => { if (event.touches.length !== 1) touch = null; };
+    image.ontouchcancel = () => { touch = null; };
+    image.ontouchend = event => {
+      const start = touch; touch = null;
+      if (!start || event.touches.length || !event.changedTouches.length) return;
+      const dx = event.changedTouches[0].clientX - start.x;
+      const dy = event.changedTouches[0].clientY - start.y;
+      if (Math.abs(dx) >= 45 && Math.abs(dx) > Math.abs(dy) * 1.5) move(dx < 0 ? 1 : -1);
+    };
+    render();
+    $("closeJourneyViewer").setAttribute('aria-label', journeyCopy().close);
+    $("closeJourneyViewer").onclick = () => viewer.close();
+    viewer.onclick = event => { if (event.target === viewer) viewer.close(); };
+    viewer.onclose = () => { trigger?.focus({preventScroll: true}); scroller.scrollTop = scrollTop; };
+    openAlbumLayer(viewer);
   }
+
+  function openJourneyAlbum() {
+    const profile = getProfile(), words = journeyCopy(), step = profile.journey.step;
+    const nextStop = step < window.KapiJourney.MAX_STEP ? `<aside class="album-next"><strong>${language === 'ru' ? 'Следующая остановка' : 'Nächster Halt'}: ${words.places[step+1]}</strong><span>${language === 'ru' ? 'Откроется после следующего завершённого занятия' : 'Wird nach der nächsten abgeschlossenen Übung freigeschaltet'}</span></aside>` : '';
+    $("journeyAlbumContent").innerHTML = `<div class="album-header"><h2 id="journeyAlbumTitle">${words.album}</h2><button class="text-button" id="closeJourneyAlbum">${words.close}</button></div><div class="album-scroll"><p>${step + 1} / 24</p>${nextStop}` + window.KapiJourney.chapters.map((chapter, c) => {
+      return `<details class="album-chapter" ${c <= window.KapiJourney.chapter(step) ? "open" : ""}><summary>${chapter[language === 'ru' ? 1 : 2]}</summary><div class="album-places">` + words.places.slice(c * 4, c * 4 + 4).map((name, n) => {
+        const i = c * 4 + n, scene = window.KapiJourney.scene(i), unlocked = i <= step;
+        return `<figure class="album-place ${unlocked ? 'visited' : 'locked'} ${i === step + 1 ? 'nearest' : ''}"><div class="album-picture" ${unlocked ? `style='background-image:url("assets/journey/${scene.asset}");background-position:${scene.position};background-size:${scene.size}'` : ''}>${unlocked ? '' : '<span class="album-unvisited">🔒</span>'}</div><figcaption>${i + 1}. ${name}${i === step ? ' ●' : unlocked ? ' ✓' : ''}${i === step + 1 ? `<small class="next-stop-help">${language === 'ru' ? 'Откроется после следующего занятия' : 'Öffnet sich nach der nächsten Übung'}</small>` : ''}</figcaption>${albumViewButton(i, name, unlocked)}</figure>`;
+      }).join('') + `</div></details>`;
+    }).join('') + '</div>';
+    $("journeyAlbumContent").onclick = event => {
+      const trigger = event.target.closest('[data-album-view]');
+      if (trigger) openJourneyViewer(Number(trigger.dataset.albumView), trigger);
+    };
+    $("closeJourneyAlbum").onclick = () => $("journeyAlbum").close();
+    openAlbumLayer($("journeyAlbum"));
+  }
+
   function openJourneyPicker(id) {
-    showJourneyChoice(id, () => { $("journeyPicker").close(); updateMascotOutfit(); renderWardrobe(); renderJourneyWardrobe(); updateHomeStats(); }, false);
+    showJourneyChoice(id, () => { $("journeyPicker").close(); updateMascotOutfit(); renderWardrobe();  updateHomeStats(); }, false);
     $("journeyPicker").showModal();
   }
   function showJourneyChoice(id, done, inResult) {
@@ -712,7 +802,8 @@
   function renderRewardGoal(surface, totalXp) {
     const next = rewards.getNextReward(totalXp);
     const prefix = surface === "home" ? "homeReward" : "resultReward";
-    $(prefix + "Text").textContent = next.allUnlocked ? copy.allRewards : copy.xpGoal(next.currentXp, next.targetXp);
+    $(prefix + "Goal").dataset.complete = String(next.allUnlocked);
+    $(prefix + "Text").textContent = next.allUnlocked ? "" : copy.xpGoal(next.currentXp, next.targetXp);
     $(prefix + "Fill").style.width = `${next.progress * 100}%`;
     $(prefix + "Next").textContent = next.allUnlocked ? "" : next.currentXp === 0 && surface === "home"
       ? copy.firstReward : `${surface === "result" ? `${copy.nextTarget}: ` : ""}${copy.nextGoal(next.remainingXp, rewardName(next.reward))}`;
@@ -728,22 +819,27 @@
   }
 
   function renderWardrobe() {
-    const profile = getProfile();
+    const profile = getProfile(), scroller = $("wardrobeItems"), scrollTop = scroller.scrollTop;
+    const nextReward = rewards.getNextReward(profile.totalXp).reward;
     const slots = ["hat", "glasses", "neck", "back", "badge"];
-    const visible = new Set(rewards.getRewards().filter((reward) => profile.unlockedRewards.includes(reward.id)).map((reward) => reward.id));
-    rewards.getRewards().filter((reward) => !visible.has(reward.id)).slice(0, 3).forEach((reward) => visible.add(reward.id));
-    $("wardrobeItems").innerHTML = slots.map((slot) => `<section class="wardrobe-slot"><strong>${copy.wardrobeSlots[slot]}</strong><div class="wardrobe-options">
-      <button class="wardrobe-item" type="button" data-unequip="${slot}" aria-pressed="${profile.equippedOutfit[slot] === null}">${copy.noItem}${profile.equippedOutfit[slot] === null ? ` · ${copy.selected}` : ""}</button>
-      ${rewards.getRewards().filter((reward) => reward.slot === slot && visible.has(reward.id)).map((reward) => {
-        const unlocked = profile.unlockedRewards.includes(reward.id);
-        const selected = profile.equippedOutfit[slot] === reward.id;
-        return `<button class="wardrobe-item" type="button" data-equip="${reward.id}" aria-label="${rewardName(reward)} · ${unlocked ? selected ? copy.selected : copy.unlocked : copy.locked(reward.xp)}" aria-pressed="${selected}" ${unlocked ? "" : "disabled"}><img src="assets/cosmetics/${window.KapiJourney.variant(profile, reward.id)?.asset || reward.asset}.svg" alt=""><span>${window.KapiJourney.variant(profile, reward.id)?.[language] || rewardName(reward)}</span><small>${unlocked ? selected ? copy.selected : copy.unlocked : copy.locked(reward.xp)}</small></button>`;
-      }).join("")}</div></section>`).join("");
+    const visible = new Set(profile.unlockedRewards);
+    const ru = language === "ru";
+    const nextAsset = nextReward && (window.KapiJourney.variant(profile, nextReward.id)?.asset || nextReward.asset);
+    scroller.innerHTML = (nextReward ? `<section class="wardrobe-next"><img src="assets/cosmetics/${nextAsset}.svg" alt=""><div><small>${ru ? "Ближайшая награда" : "Nächste Belohnung"}</small><h3>${rewardName(nextReward)}</h3><p>${ru ? "Ещё " : "Noch "}${pointCount(nextReward.xp-profile.totalXp)}</p></div></section>` : `<h3 class="wardrobe-collection">${ru ? "Твоя коллекция" : "Deine Sammlung"}</h3>`) + slots.filter(slot => rewards.getRewards().some(reward => reward.slot === slot && visible.has(reward.id))).map(slot => `<section class="wardrobe-slot" aria-label="${copy.wardrobeSlots[slot]}"><h3>${copy.wardrobeSlots[slot]}</h3><div class="wardrobe-options">
+      ${rewards.getRewards().filter(reward => reward.slot === slot && visible.has(reward.id)).map(reward => {
+        const variants = window.KapiJourney.variants[reward.id] || [{id: '', asset: reward.asset, [language]: rewardName(reward)}];
+        return variants.map(variant => {
+          const selected = profile.equippedOutfit[slot] === reward.id && (!variant.id || profile.cosmeticVariants[reward.id] === variant.id);
+          const action = ru ? (selected ? "Снять" : "Надеть") : (selected ? "Ablegen" : "Anziehen");
+          return `<button class="wardrobe-item" type="button" data-equip="${reward.id}" data-variant="${variant.id}" aria-label="${variant[language]} · ${action}" aria-pressed="${selected}"><img src="assets/cosmetics/${variant.asset}.svg" alt=""><span>${action}</span></button>`;
+        }).join('');
+      }).join('')}</div></section>`).join('');
+    scroller.scrollTop = scrollTop;
   }
 
   function showWardrobe() {
     renderWardrobe();
-    renderJourneyWardrobe();
+
     $("wardrobeDialog").showModal();
     kapi?.animator?.play("idle", { surface: "wardrobe" });
   }
@@ -754,22 +850,31 @@
   }
 
   function renderCurriculumMap() {
-    const profile = getProfile();
-    const stage = profile.currentStage;
-    const allComplete = profile.curriculumCompleted && stage === CURRICULUM_STAGE_COUNT;
-    $("mapIntro").textContent = allComplete ? copy.mapAllComplete : copy.mapIntro;
-    $("mapIntro").classList.toggle("map-complete", allComplete);
-    $("mapChapters").innerHTML = curriculumMap.chaptersAt(stage, profile.curriculumCompleted).map((chapter) => {
-      const status = { completed: copy.mapCompleted, current: copy.mapCurrent, locked: copy.mapLocked }[chapter.status];
-      const currentStep = chapter.status === "current" ? `<small>${copy.mapSteps(chapter.step, chapter.total)} · ${copy.stageNames[stage - 1]}</small>` : "";
-      const reinforced = chapter.status === "completed" && Array.from({ length: chapter.last - chapter.first + 1 }, (_, index) => chapter.first + index)
-        .every((step) => ["secure", "stable"].includes(mastery.getMasteryStatus(profile.skillMastery[mastery.skillIdForProblem({ curriculumStage: step })])))
-        ? `<small class="map-mastery">✓ ${copy.mapReinforced}</small>` : "";
-      return `<article class="map-chapter ${chapter.status}" aria-label="${chapter[language]}: ${status}">
-        <div class="map-marker">${chapter.status === "current" ? '<img src="assets/kapi-rig-v2/head.png" alt="">' : chapter.status === "completed" ? "✓" : "🔒"}</div>
-        <div><strong>${chapter[language]}</strong><p>${chapter[language === "de" ? "detailDe" : "detailRu"]}</p>${currentStep}${reinforced}</div>
-        <span class="map-status">${status}</span></article>`;
-    }).join("");
+    const profile = getProfile(), ru = language === 'ru';
+    const stage = profile.currentStage, selected = appSettings.automatic ? stage : appSettings.manualStage;
+    $("mapIntro").textContent = `${profile.curriculumCompleted ? copy.mapAllComplete + " " : ""}${ru ? 'Автоматическое обучение' : 'Automatischer Lernweg'}: ${copy.stageNames[stage-1]}. ${ru ? 'Выбрано для следующего занятия' : 'Für die nächste Übung gewählt'}: ${copy.stageNames[selected-1]}.`;
+    $("mapIntro").classList.toggle('map-complete', profile.curriculumCompleted);
+    const chapters = curriculumMap.chaptersAt(stage, profile.curriculumCompleted);
+    const render = chapter => {
+      const chosen = selected >= chapter.first && selected <= chapter.last;
+      const active = chapter.status === 'current';
+      const label = chosen ? (ru?'Выбрано для следующего занятия':'Für die nächste Übung gewählt') : chapter.status === 'completed' ? (ru?'Освоено автоматически':'Automatisch abgeschlossen') : active ? (ru?'Изучаем автоматически':'Automatisch in Arbeit') : (ru?'Будущая тема':'Zukünftiges Thema');
+      const exampleStage = chosen ? selected : active ? stage : chapter.first;
+      const reinforced = chapter.status === 'completed' && Array.from({length:chapter.last-chapter.first+1},(_,i)=>chapter.first+i).every(step=>['secure','stable'].includes(mastery.getMasteryStatus(profile.skillMastery[mastery.skillIdForProblem({curriculumStage:step})])));
+
+      return `<details class="map-chapter ${chosen&&!appSettings.automatic?'selected':chapter.status}" ${chosen||active?'open':''}><summary>${active?'<img src="assets/kapi-rig-v2/head.png" width="28" height="28" alt="">':''}<strong>${chapter[language]}</strong><span class="map-status">${label}</span></summary><p>${chapter[ru?'detailRu':'detailDe']}</p><p>${STAGE_EXAMPLES[exampleStage-1]}</p>${!chosen&&!active&&chapter.status!=='completed'?`<p class="map-condition">${ru ? (appSettings.automatic ? "Откроется, когда освоены предыдущие темы." : "Можно выбрать в настройках, если позволяет диапазон.") : (appSettings.automatic ? "Wird nach den vorherigen Themen freigeschaltet." : "In den Einstellungen wählbar, wenn der Zahlenraum passt.")}</p>`:""}${active?`<small>${copy.mapSteps(chapter.step,chapter.total)}</small>`:""}${reinforced?`<small>✓ ${copy.mapReinforced}</small>`:""}${chosen||active||chapter.status==='completed'?`<button type="button" class="text-button" data-map-practice="${exampleStage}">${ru?'Тренироваться':'Üben'}</button>`:''}</details>`;
+    };
+    const near = chapters.filter(c => c.status==='current'||selected>=c.first&&selected<=c.last);
+    $("mapChapters").innerHTML = near.map(render).join('') + `<details class="map-full-plan"><summary>${ru?'Весь учебный план — для родителей':'Gesamter Lernplan — für Eltern'}</summary>${chapters.filter(c=>!near.includes(c)).map(render).join('')}</details>`;
+  }
+
+  function practiceHistoryProblem(p) {
+    if (!tasks.isValidReviewProblem({ ...p, correctStreak:0, lastShown:0 })) return;
+    const target = skills.classifyProblem(p), profile = getProfile();
+    if (!target.skillId) return;
+    if (target.subskillId && !subskills.availableSubskills(target.skillId, profile).includes(target.subskillId)) return;
+    $("statsDialog").close(); $("settingsDialog").close();
+    startTraining({}, { profile, targeted:{...target,historyPractice:true,taskType:p.taskType}, trainingStage:skills.stageForSkill(target.skillId) });
   }
 
   function showCurriculumMap() {
@@ -790,8 +895,9 @@
     stageIntroSoundTimers.forEach((timer) => window.clearTimeout(timer));
     stageIntroSoundTimers = [];
     window.cancelAnimationFrame(stageIntroFrame);
-    if (target !== $("gameScreen")) { paceAnimation?.cancel(); window.clearTimeout(advanceTimer); window.clearTimeout(solutionTimer); }
+    if (target !== $("gameScreen")) { window.clearTimeout(autoAnswerTimer); paceAnimation?.cancel(); window.clearTimeout(advanceTimer); window.clearTimeout(solutionTimer); }
     if (target !== $("resultScreen")) {
+      continueArrival = null;
       window.clearTimeout(resultShowTimer);
       window.clearTimeout(resultPhaseTimer);
       revealResultReward = null;
@@ -949,7 +1055,7 @@
       operationAvailableAtStage(operation, stage) &&
       stageOperations.has(operation)
     );
-    if (stage > 1 && !appSettings.operations.length) appSettings.operations = [nativeOperationForStage(stage)];
+    if (!appSettings.operations.length) appSettings.operations = [stage === 1 ? "add" : nativeOperationForStage(stage)];
   }
 
   function syncStageToOperations() {
@@ -1341,8 +1447,10 @@ function makePowerProblem(max, mastered) {
   function selectProblem(stage, index) {
     const profile = getProfile();
     if (state.targeted) {
-      const focused = subskills.makeProblemForSubskill(state.targeted.skillId, state.targeted.subskillId,
-        makeCurriculumProblem, index, profile, state.recentFacts);
+      const focused = state.targeted.historyPractice && !state.targeted.subskillId
+        ? skills.makeProblemForSkill(state.targeted.skillId, makeCurriculumProblem, index, profile)
+        : subskills.makeProblemForSubskill(state.targeted.skillId, state.targeted.subskillId,
+          makeCurriculumProblem, index, profile, state.recentFacts);
       if (!focused) throw new Error(`Cannot generate targeted problem for ${state.targeted.subskillId}`);
       return { ...focused, isTargetedPractice: true };
     }
@@ -1489,7 +1597,10 @@ function makePowerProblem(max, mastered) {
     state.enteredAnswer = "";
     state.spacedReviewRecorded = false;
     const base = selectProblem(state.stage, state.index);
-    state.problem = base.isReview || base.isSpacedReview ? base : tasks.decorate(base, state.previousTaskType);
+    state.problem = base.isReview || base.isSpacedReview ? base : tasks.decorate(base, state.previousTaskType, state.targeted?.historyPractice ? state.targeted.taskType : undefined);
+    choiceStates.delete(state.problem);
+    answerAttempts.delete(state.problem);
+    if (state.problem.mode === "choice") choicesFor(state.problem);
     state.recentFacts ||= [];
     state.recentFacts.push(state.problem.key);
     state.recentFacts = state.recentFacts.slice(-4);
@@ -1497,6 +1608,7 @@ function makePowerProblem(max, mastered) {
     state.startedAt = performance.now();
     $("problemNumber").textContent = String(state.index + 1);
     $("scoreValue").textContent = String(state.score);
+    $("scoreUnit").textContent = pointCount(state.score).split(" ").slice(1).join(" ");
     $("streakValue").textContent = String(state.streak);
     $("streakPill").classList.toggle("hidden", state.streak < 2);
     $("progressFill").style.width = `${(state.index / TOTAL) * 100}%`;
@@ -1505,7 +1617,7 @@ function makePowerProblem(max, mastered) {
     $("hint").classList.add("hidden");
     $("hint").innerHTML = "";
     const nextFeedback = state.index === 0 && state.targeted
-      ? copy.targetedIntro(skills.subskillLabel(state.targeted.subskillId, language))
+      ? copy.targetedIntro(state.targeted.historyPractice ? skills.label(state.targeted.skillId, language) : skills.subskillLabel(state.targeted.subskillId, language))
       : state.index === 0 ? copy.careful : copy.next;
     if (motivationLabel && !motivationLabel.result) motivationLabel.previous = nextFeedback;
     $("feedback").textContent = motivationLabel && !motivationLabel.result ? motivationLabel.text : nextFeedback;
@@ -1514,6 +1626,8 @@ function makePowerProblem(max, mastered) {
   }
 
   function renderProblem(problem) {
+    document.querySelector(".play-card").classList.toggle("math-focused", (problem.curriculumStage || state.stage) >= 31);
+    document.querySelector(".play-card").classList.toggle("count-focused", problem.operation === "count");
     const display = tasks.display(problem, language);
     $("problemText").textContent = display.text;
     $("problemText").classList.toggle("problem-wide", display.text.length > 12 || problem.taskType === "microStory");
@@ -1523,18 +1637,34 @@ function makePowerProblem(max, mastered) {
     document.querySelector(".play-card").classList.toggle("has-task-visual", !!display.html);
   }
 
+  const choiceStates = new WeakMap();
+  const answerAttempts = new WeakMap();
+  function choicesFor(problem) {
+    if (!choiceStates.has(problem)) {
+      const labels = tasks.choiceLabels(problem, language);
+      choiceStates.set(problem, { values: labels ? labels.map((_, index) => index) : makeChoices({ ...problem, answer: tasks.response(problem) }), rejected: new Set() });
+    }
+    return choiceStates.get(problem);
+  }
+
   function renderAnswer() {
+    window.clearTimeout(autoAnswerTimer);
     const area = $("answerArea");
     area.innerHTML = "";
     if (state.problem.mode === "choice") {
       const wrap = document.createElement("div");
       wrap.className = state.problem.expressionChoices || state.problem.placeValue?.options ? "choices task-choice-labels" : "choices";
       const labels = tasks.choiceLabels(state.problem, language);
-      const values = labels ? labels.map((_, index) => index) : makeChoices({ ...state.problem, answer: tasks.response(state.problem) });
+      const { values, rejected } = choicesFor(state.problem);
       values.forEach((value) => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "answer-button";
+        if (rejected.has(String(value))) {
+          button.classList.add("answer-rejected");
+          button.disabled = true;
+          button.setAttribute("aria-label", `${labels ? labels[value] : displayAnswer(value, state.problem.answerType)} — ${language === "ru" ? "уже пробовали, неверно" : "schon versucht, falsch"}`);
+        }
         button.textContent = labels ? labels[value] : displayAnswer(value, state.problem.answerType);
         button.addEventListener("click", () => submitAnswer(value));
         wrap.appendChild(button);
@@ -1554,7 +1684,7 @@ function makePowerProblem(max, mastered) {
         ${keypadSpecialKeys(state.problem).length ? `<div class="keypad-specials">
           ${keypadSpecialKeys(state.problem).map(([key, label]) => `<button class="number-key number-key-special" type="button" data-key="${key}">${label}</button>`).join("")}
         </div>` : ""}
-        <button class="submit-button" type="button" data-action="submit">${copy.check}</button>`;
+        <button class="submit-button" type="button" data-action="submit" disabled>${copy.check}</button>`;
       keypad.addEventListener("click", handleKeypadClick);
       area.appendChild(keypad);
       updateKeypadDisplay();
@@ -1569,10 +1699,8 @@ function makePowerProblem(max, mastered) {
       const key = button.dataset.key;
       if (canAppendKey(state.enteredAnswer, key, state.problem.answerType, state.problem) && state.enteredAnswer.length < 12) state.enteredAnswer += key;
       updateKeypadDisplay();
+      scheduleCorrectKeypadAnswer();
       sound("tap");
-      if (state.enteredAnswer !== "" && answersEqual(state.enteredAnswer, tasks.response(state.problem), state.problem.answerType)) {
-        submitAnswer(state.enteredAnswer);
-      }
       return;
     }
     if (button.dataset.action === "clear") state.enteredAnswer = "";
@@ -1582,6 +1710,24 @@ function makePowerProblem(max, mastered) {
       return;
     }
     updateKeypadDisplay();
+    scheduleCorrectKeypadAnswer();
+  }
+
+  // Accept only a complete, correct value after a pause. Further typing or deletion
+  // cancels the pending check, including correct prefixes such as 0 in 0/5.
+  function scheduleCorrectKeypadAnswer() {
+    window.clearTimeout(autoAnswerTimer);
+    const problem = state.problem, value = state.enteredAnswer;
+    const complete = problem.answerType === "fraction"
+      ? !parseFractionAnswer(value).error : /^-?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(value);
+    if (state.locked || problem.mode === "choice" || !complete ||
+        !answersEqual(value, tasks.response(problem), problem.answerType)) return;
+    const answeredAt = performance.now();
+    autoAnswerTimer = window.setTimeout(() => {
+      if (state.problem !== problem || state.enteredAnswer !== value || state.locked ||
+          !$("gameScreen").classList.contains("active") || document.querySelectorAll("dialog[open]").length) return;
+      submitAnswer(value, answeredAt);
+    }, 800);
   }
 
   function updateKeypadDisplay() {
@@ -1589,6 +1735,8 @@ function makePowerProblem(max, mastered) {
     if (!display) return;
     display.textContent = state.enteredAnswer || copy.answer;
     display.classList.toggle("empty", state.enteredAnswer === "");
+    const submit = $("answerArea").querySelector('[data-action="submit"]');
+    if (submit) submit.disabled = state.enteredAnswer.trim() === "";
   }
 
   function displayAnswer(value, answerType) {
@@ -1619,12 +1767,20 @@ function makePowerProblem(max, mastered) {
     return /^[0-9]$/.test(key);
   }
 
+  function parseFractionAnswer(value) {
+    const match = String(value).trim().match(/^(-?\d+)(?:\/(\d+))?$/);
+    if (!match) return { error: 'incomplete' };
+    const numerator = Number(match[1]), denominator = match[2] === undefined ? 1 : Number(match[2]);
+    if (denominator === 0) return { error: 'zeroDenominator' };
+    if (!Number.isSafeInteger(numerator) || !Number.isSafeInteger(denominator)) return { error: 'incomplete' };
+    return { normalized: normalizeFraction(numerator, denominator) };
+  }
+
   function answersEqual(value, answer, answerType) {
     const raw = String(value).trim().replace(",", ".");
     if (answerType === "fraction") {
-      const match = raw.match(/^(-?\d+)\/(\d+)$/);
-      if (!match || Number(match[2]) === 0) return false;
-      return normalizeFraction(Number(match[1]), Number(match[2])) === String(answer);
+      const parsed = parseFractionAnswer(value), expected = parseFractionAnswer(answer);
+      return !parsed.error && !expected.error && parsed.normalized === expected.normalized;
     }
     const numeric = Number(raw);
     return Number.isFinite(numeric) && Math.abs(numeric - Number(answer)) < .000001;
@@ -1686,12 +1842,27 @@ function makePowerProblem(max, mastered) {
     return [...values].slice(0, 4).sort(() => Math.random() - .5);
   }
 
-  function submitAnswer(value) {
+  function submitAnswer(value, answeredAt = performance.now()) {
+    window.clearTimeout(autoAnswerTimer);
     if (state.locked) return;
+    if (state.problem.mode === "choice" && choicesFor(state.problem).rejected.has(String(value))) return;
+    if (state.problem.answerType === "fraction") {
+      const { error } = parseFractionAnswer(value);
+      if (error) {
+        dismissMotivation();
+        $("feedback").textContent = error === 'zeroDenominator'
+          ? (language === 'ru' ? 'Знаменатель не может быть нулём' : 'Der Nenner darf nicht null sein')
+          : (language === 'ru' ? 'Заверши запись: введи целое число или дробь с числителем и знаменателем' : 'Vervollständige die Eingabe: eine ganze Zahl oder einen Bruch mit Zähler und Nenner');
+        return;
+      }
+    }
+    const responses = answerAttempts.get(state.problem) || [];
+    responses.push(String(value));
+    answerAttempts.set(state.problem, responses);
     paceAnimation?.pause();
     dismissMotivation();
     state.paceUpdate = null;
-    const elapsed = Math.max(.2, (performance.now() - state.startedAt) / 1000);
+    const elapsed = Math.max(.2, (answeredAt - state.startedAt) / 1000);
     const isCorrect = answersEqual(value, tasks.response(state.problem), state.problem.answerType);
     const operationMessage = state.attempt === 1 && !state.problem.isReview && !state.problem.isSpacedReview && !state.targeted
       ? recordOperationAttempt(state.problem.operation, isCorrect)
@@ -1722,7 +1893,7 @@ function makePowerProblem(max, mastered) {
       const adaptiveMessage = updateAdaptiveProgress(state.problem, state.attempt === 1, true, elapsed);
       const reachedNewStage = state.stage > stageBeforeAnswer;
       const text = recovery === "errorMastered" ? copy.masteredTitle : recovery === "errorRecovered" ? copy.recoveredTitle : pick(messages.correct);
-      $("feedback").textContent = `${text} +${earned} ★`;
+      $("feedback").textContent = `${text} +${pointCount(earned)}`;
       const events = [{ type: "correct" }];
       if (recovery) events.push({ type: recovery });
       if ([3, 6, 10].includes(state.streak)) events.push({ type: "streakMilestone", count: state.streak });
@@ -1735,7 +1906,8 @@ function makePowerProblem(max, mastered) {
         // Final-answer rewards and completion are selected in one batch.
         state.finalMotivationEvents = events;
       } else {
-        motivation.handle(events, { batchId: `answer:${state.index}:${state.attempt}`, notice: operationMessage || adaptiveMessage });
+        if ((state.problem.curriculumStage || state.stage) >= 31) { sound("correct"); kapi.reset("game", "idle"); }
+        else motivation.handle(events, { batchId: `answer:${state.index}:${state.attempt}`, notice: operationMessage || adaptiveMessage });
       }
       scheduleAdvance(350);
       return;
@@ -1745,12 +1917,14 @@ function makePowerProblem(max, mastered) {
     const adaptiveMessage = updateAdaptiveProgress(state.problem, state.attempt === 1, false, elapsed);
     state.streak = 0;
     $("streakPill").classList.add("hidden");
-    motivation.handle([{ type: "wrong" }], { batchId: `answer:${state.index}:${state.attempt}` });
+    if ((state.problem.curriculumStage || state.stage) >= 31) { sound("wrong"); kapi.reset("game", "idle"); }
+    else motivation.handle([{ type: "wrong" }], { batchId: `answer:${state.index}:${state.attempt}` });
     if (state.attempt === 1) {
       registerProblemError(state.problem);
       state.attempt = 2;
       state.hintLevel = 2;
       state.enteredAnswer = "";
+      if (state.problem.mode === "choice") choicesFor(state.problem).rejected.add(String(value));
       $("feedback").textContent = pick(messages.tryAgain);
       if (adaptiveMessage) showMotivation(adaptiveMessage, copy.adaptiveAdjusted, null, "wrong");
       showDetailedHint();
@@ -1792,29 +1966,31 @@ function makePowerProblem(max, mastered) {
     const next = document.createElement("button");
     next.type = "button"; next.className = "submit-button solution-next";
     next.textContent = language === "ru" ? "Дальше" : "Weiter";
-    next.addEventListener("click", continueAfterSolution);
-    const replay = document.createElement("button");
-    replay.type = "button"; replay.className = "text-button solution-replay";
-    replay.textContent = language === "ru" ? "Показать ещё раз" : "Noch einmal zeigen";
+    const previous = document.createElement("button");
+    previous.type = "button"; previous.className = "text-button solution-previous";
+    previous.textContent = language === "ru" ? "Предыдущий шаг" : "Vorheriger Schritt";
     $("answerArea").innerHTML = "";
-    $("answerArea").append(replay, next);
-    const play = () => {
-      window.clearTimeout(solutionTimer);
-      let index = 0;
-      const step = () => {
-        if (state.problem !== problem || !state.solutionShown || !$("gameScreen").classList.contains("active")) return;
-        const current = plan.steps[index];
-        $("hint").textContent = `${plan.context ? `${plan.context} · ` : ""}${language === "ru" ? `Шаг ${index + 1} из ${plan.steps.length}` : `Schritt ${index + 1} von ${plan.steps.length}`} · ${current.text}`;
-        $("taskVisual").innerHTML = current.visual || plan.hintVisual;
-        $("taskVisual").classList.toggle("hidden", !$("taskVisual").innerHTML);
-        scheduleFitCheck();
-        index += 1;
-        if (index < plan.steps.length) solutionTimer = window.setTimeout(step, 1300);
-      };
-      step();
+    $("answerArea").append(previous, next);
+    let index = 0;
+    const render = () => {
+      if (state.problem !== problem || !state.solutionShown) return;
+      const current = plan.steps[index];
+      $("hint").textContent = `${plan.context ? `${plan.context} · ` : ""}${language === "ru" ? `Шаг ${index + 1} из ${plan.steps.length}` : `Schritt ${index + 1} von ${plan.steps.length}`} · ${current.text}`;
+      $("taskVisual").innerHTML = current.visual || plan.hintVisual;
+      $("taskVisual").classList.toggle("hidden", !$("taskVisual").innerHTML);
+      previous.disabled = index === 0;
+      next.textContent = index === plan.steps.length - 1
+        ? (language === "ru" ? "Следующий пример" : "Nächste Aufgabe")
+        : (language === "ru" ? "Следующий шаг" : "Nächster Schritt");
+      next.dataset.lastStep = String(index === plan.steps.length - 1);
+      scheduleFitCheck();
     };
-    replay.addEventListener("click", play);
-    play();
+    previous.addEventListener("click", () => { if (index > 0) { index--; render(); } });
+    next.addEventListener("click", () => {
+      if (index < plan.steps.length - 1) { index++; render(); }
+      else continueAfterSolution();
+    });
+    render();
     next.focus({ preventScroll: true });
   }
 
@@ -1827,6 +2003,8 @@ function makePowerProblem(max, mastered) {
 
   function recordResult(success, elapsed, attempt) {
     const item = {
+      problem: JSON.parse(JSON.stringify(state.problem)),
+      responses: [...(answerAttempts.get(state.problem) || [])],
       key: state.problem.key,
       text: state.problem.text,
       a: state.problem.a,
@@ -2254,12 +2432,13 @@ function makePowerProblem(max, mastered) {
       curriculumVersion: CURRICULUM_VERSION,
       advanced,
       perfect,
+      mistakes: state.results.filter((item) => !item.firstTry && item.problem).map((item) => ({ problem: item.problem, responses: item.responses })),
       trouble: state.results.filter((item) => !item.firstTry).map((item) => item.key).slice(0, 5)
     };
     const { unlocked, weeklyGoalComplete } = saveSession(session);
     $("correctValue").textContent = String(state.correct);
     $("averageValue").textContent = `${formatSeconds(average)} ${copy.seconds}`;
-    $("starsValue").textContent = `${state.score} XP`;
+    $("starsValue").textContent = pointCount(state.score);
     $("resultTitle").textContent = perfect ? copy.perfectTitle : copy.completeTitle;
     const freshProfile = getProfile();
     const chapterBefore = curriculumMap.chapterForStage(state.trainingStartStage);
@@ -2270,9 +2449,24 @@ function makePowerProblem(max, mastered) {
     if (advanced && chapterBefore?.id !== chapterAfter?.id && chapterAfter) {
       $("resultNote").textContent += ` ${copy.chapterFinished} ${copy.newChapter(chapterAfter[language])}`;
     }
-    if (freshProfile.journey.step > profile.journey.step && window.KapiJourney.postcards(freshProfile).includes(freshProfile.journey.step)) {
-      $("resultNote").textContent += language === "ru" ? " Новая открытка в альбоме!" : " Neue Postkarte im Reisealbum!";
-    }
+    const trouble = state.results.find(item => !item.firstTry && item.problem);
+    const nextTopic = trouble?.problem || {curriculumStage: appSettings.automatic ? freshProfile.currentStage : appSettings.manualStage};
+    const topicName = nextTopic.operation === 'count' ? (language === 'ru' ? 'подсчёт предметов' : 'das Zählen von Gegenständen') : copy.stageNames[(nextTopic.curriculumStage || freshProfile.currentStage)-1];
+    $("resultNote").textContent = language === 'ru'
+      ? `${state.correct} из ${TOTAL}. ${trouble ? 'Ещё потренируем' : 'Продолжим тему:'} ${topicName}.`
+      : `${state.correct} von ${TOTAL}. ${trouble ? 'Wir üben noch' : 'Wir üben weiter:'} ${topicName}.`;
+    if (freshProfile.curriculumCompleted && !state.trainingStartedCompleted) $("resultNote").textContent += ` ${copy.curriculumComplete}`;
+    else if (advanced && chapterBefore?.id !== chapterAfter?.id && chapterAfter) $("resultNote").textContent += ` ${copy.chapterFinished} ${copy.newChapter(chapterAfter[language])}`;
+    const progressExplanation = $("resultProgressExplanation");
+    progressExplanation.hidden = !!storage.getItem("kapi-progress-explained-v2");
+    progressExplanation.textContent = language === "ru"
+      ? "Завершённое занятие открывает следующее место, пока маршрут не пройден. Очки за верные ответы открывают вещи для Капи. " + (appSettings.automatic ? "Когда тема освоена, задания становятся сложнее." : "В ручном режиме тему выбираешь ты — она не меняется автоматически.")
+      : "Eine abgeschlossene Übung öffnet den nächsten Ort, bis die Reise vollständig ist. Punkte für richtige Antworten schalten Kapis Sachen frei. " + (appSettings.automatic ? "Wenn du ein Thema beherrschst, werden die Aufgaben schwieriger." : "Im manuellen Modus wählst du das Thema selbst. Es wechselt nicht automatisch.");
+    storage.setItem("kapi-progress-explained-v2", "1");
+    $("resultRepeatButton").hidden = !trouble;
+    $("resultRepeatButton").textContent = language === 'ru' ? 'Повторить трудное' : 'Schwieriges wiederholen';
+    $("resultNewButton").textContent = language === 'ru' ? 'Начать новое занятие' : 'Neue Übung starten';
+    $("resultNewButton").classList.toggle('primary-button', !trouble);
     renderRewardGoal("result", freshProfile.totalXp);
     $("resultRewardProgress").classList.toggle("hidden", unlocked.length > 0);
     $("weeklyResult").classList.add("hidden");
@@ -2298,7 +2492,7 @@ function makePowerProblem(max, mastered) {
         saveProfile(profile);
         updateMascotOutfit(profile);
         $("rewardReveal").innerHTML = `<strong>${weeklyGoalComplete && earned.length ? copy.weeklyAndReward : earned.length ? copy.newThings(earned.length) : copy.weeklyDone}</strong>${earned.length ? `<div>${earned.map((reward) =>
-          `<img src="assets/cosmetics/${reward.asset}.svg" alt="">${rewardName(reward)} ${copy.rewardUnlocked}`).join(" · ")}</div>` : ""}${weeklyGoalComplete && earned.length ? `<div>${copy.weeklyDone}</div>` : ""}`;
+          `<img src="assets/cosmetics/${reward.asset}.svg" alt="">${language === "ru" ? "Открыто:" : "Freigeschaltet:"} ${rewardName(reward)}<button type="button" class="text-button" data-equip-now="${reward.id}">${language === "ru" ? "Надеть сейчас" : "Jetzt anziehen"}</button>`).join(" · ")}</div>` : ""}${weeklyGoalComplete && earned.length ? `<div>${copy.weeklyDone}</div>` : ""}`;
         $("rewardReveal").classList.remove("hidden");
         if (animate) kapi.trigger("rewardReveal", { surface: "result", rewardAsset: earned[0]?.asset });
         rewardGoalTimer = window.setTimeout(() => {
@@ -2350,12 +2544,10 @@ function makePowerProblem(max, mastered) {
       const arrivalStep = getProfile().journey.step;
       const chapterEnd = arrivalStep >= 7 && arrivalStep % 4 === 3;
       if (chapterEnd) {
-        const postcardLabel = document.createElement("small");
-        postcardLabel.textContent = journeyCopy().postcard;
-        $("resultShowTitle").appendChild(postcardLabel);
         $("resultScreen").dataset.chapterCelebration = String(window.KapiJourney.chapter(arrivalStep));
       } else delete $("resultScreen").dataset.chapterCelebration;
-      resultPhaseTimer = window.setTimeout(() => showItems(), chapterEnd ? 4200 : 2500);
+      $("continueArrival").textContent = ru ? "Нажми на картинку, чтобы продолжить" : "Tippe auf das Bild, um weiterzugehen";
+      continueArrival = () => showItems();
     }, 4000);
   }
 
@@ -2431,10 +2623,10 @@ function makePowerProblem(max, mastered) {
         }).slice(0, 3);
       const stableSkills = Object.values(profile.skillMastery).filter((skill) => mastery.getMasteryStatus(skill) === "stable").length;
       const practicingSkills = Object.values(profile.skillMastery).filter((skill) => mastery.getMasteryStatus(skill) === "inPractice").length;
-      const commonTrouble = mostCommon(history.flatMap((item) => item.trouble || []));
+      const hasTrouble = history.some(item => item.mistakes?.length || item.trouble?.length);
       content.innerHTML = `
         <div class="summary-stats">
-          <div><strong>${summary.thisWeek}</strong><span>${copy.thisWeek}</span></div>
+          <div><strong>${summary.thisWeek}</strong><span>${language === "ru" ? `из ${profile.weeklyGoal} тренировок на этой неделе` : `von ${profile.weeklyGoal} Übungen diese Woche`}</span></div>
           <div><strong>${summary.lastFourWeeks}</strong><span>${copy.lastFourWeeks}</span></div>
           <div><strong>${profile.currentStage}</strong><span>${copy.currentLevel}</span></div>
         </div>
@@ -2447,7 +2639,7 @@ function makePowerProblem(max, mastered) {
           `<li>${skills.label(skillId, language, copy.stageNames[skills.stageForSkill(skillId) - 1] || "")}</li>`).join("")}${dueSkills.length > 3 ? `<li>${copy.moreAreas(dueSkills.length - 3)}</li>` : ""}</ul>` : ""}</div>` : ""}
         ${focusTargets.length ? `<div class="subskill-summary"><strong>${copy.subskillsToPractice}</strong><div class="subskill-actions">${focusTargets.map(({ skillId, subskillId }) =>
           `<button class="target-skill-button" type="button" data-target-skill="${skillId}" data-target-subskill="${subskillId}" aria-label="${skills.subskillLabel(subskillId, language)}: ${copy.targetedPractice}"><span>${skills.subskillLabel(subskillId, language)}</span><small>${copy.targetedPractice} →</small></button>`).join("")}</div></div>` : ""}
-        <div class="history-list">${history.slice(0, 10).map((item) => {
+        <div class="history-list">${history.slice(0, 10).map((item, sessionIndex) => {
           const stage = Math.min(CURRICULUM_STAGE_COUNT, Math.max(1, Number(item.stage) || 1));
           const currentScale = item.curriculumVersion === CURRICULUM_VERSION || new Date(item.date).getTime() >= Date.parse("2026-09-27T18:11:52Z");
           const help = currentScale
@@ -2460,21 +2652,35 @@ function makePowerProblem(max, mastered) {
               <summary class="history-level" aria-label="${copy.stageInfo}" title="${copy.stageInfo}">${copy.levelShort(stage)}</summary>
               <p class="history-stage-help">${help}</p>
             </details>
+            ${renderHistoryMistakes(item, sessionIndex)}
           </div>`;
         }).join("")}</div>
-        ${commonTrouble.length
-          ? `<p class="trouble-note"><strong>${copy.repeat}</strong> ${commonTrouble.map(prettyKey).join(", ")}</p>`
-          : `<p class="trouble-note no-errors"><strong>${copy.noErrors}</strong></p>`}`;
+        ${hasTrouble ? "" : `<p class="trouble-note no-errors"><strong>${copy.noErrors}</strong></p>`}`;
     }
     $("statsDialog").showModal();
   }
 
-  function mostCommon(items) {
-    const counts = items.reduce((map, key) => map.set(key, (map.get(key) || 0) + 1), new Map());
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([key]) => key);
+  function escapeHistory(value) {
+    return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
   }
 
-  function prettyKey(key) { return key.replace("= ?", "").replace("−", " − ").replace("+", " + ").replace("×", " × ").replace("÷", " ÷ "); }
+  function renderHistoryMistakes(session, sessionIndex) {
+    const ru = language === 'ru';
+    if (!session.mistakes?.length) return session.trouble?.length
+      ? `<p class="history-mistakes">${ru ? 'В этом занятии были ошибки. Подробности ответов в старой версии не сохранялись.' : 'In dieser Übung gab es Fehler. Die frühere Version hat die Antworten nicht gespeichert.'}</p>` : '';
+    return `<div class="history-mistakes">${session.mistakes.map((entry, index) => {
+      const p = entry.problem;
+      if (!tasks.isValidReviewProblem({ ...p, correctStreak: 0, lastShown: 0 }) || !Array.isArray(entry.responses)) return '';
+      const display = tasks.display(p, language), labels = tasks.choiceLabels(p, language);
+      const answer = value => labels?.[Number(value)] ?? displayAnswer(value, p.answerType);
+      return `<article class="history-mistake"><strong>${escapeHistory(display.text)}</strong>
+        <div class="history-task-visual">${display.html || (p.operation === "count" ? tasks.renderProduce(p.answer, p) : "")}</div>
+        <p>${ru ? 'Ответ ребёнка' : 'Antwort des Kindes'}: ${entry.responses.map(value => escapeHistory(answer(value))).join(' → ')}</p>
+        <p>${ru ? 'Правильный ответ' : 'Richtige Antwort'}: ${escapeHistory(answer(tasks.response(p)))}</p>
+        <button type="button" class="text-button" data-history-repeat="${sessionIndex}:${index}">${ru ? 'Повторить похожее' : 'Ähnliche Aufgaben üben'}</button></article>`;
+    }).join('')}</div>`;
+  }
+
   function formatNumber(value) { return new Intl.NumberFormat(copy.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(Number(value || 0)); }
   function formatSeconds(value) { return formatNumber(value); }
   function formatDate(value) {
@@ -2647,7 +2853,7 @@ function makePowerProblem(max, mastered) {
     const average = state.results.length ? state.results.reduce((sum, item) => sum + item.seconds, 0) / state.results.length : 0;
     context.fillStyle = "#627774";
     context.font = "700 30px system-ui, sans-serif";
-    context.fillText(`${copy.average}: ${formatSeconds(average)} ${copy.seconds}  •  ${state.score} XP`, 105, 405);
+    context.fillText(`${copy.average}: ${formatSeconds(average)} ${copy.seconds}  •  ${pointCount(state.score)}`, 105, 405);
     context.fillStyle = "#0a514d";
     context.font = "800 26px system-ui, sans-serif";
     context.fillText(copy.shareText, 105, 495);
@@ -2727,6 +2933,7 @@ function makePowerProblem(max, mastered) {
   function handleSettingsChange(event) {
     const input = event.target;
     if (!input?.name) return;
+    if ($("settingsDialog").open) input.focus?.({preventScroll:true});
     if (input.name === "language") {
       language = input.value === "ru" ? "ru" : "de";
       appSettings.language = language;
@@ -2752,10 +2959,10 @@ function makePowerProblem(max, mastered) {
       return;
     }
     if (input.name === "automatic") {
-      appSettings.automatic = input.checked;
+      appSettings.automatic = input.value ? input.value === "auto" : input.checked;
       const profile = getProfile();
       if (appSettings.automatic) {
-        setAdaptiveStage(profile, appSettings.manualStage);
+        appSettings.manualStage = profile.currentStage;
       } else {
         appSettings.manualStage = Math.min(profile.currentStage, maximumAllowedStage());
         reconcileOperationsForStage(appSettings.manualStage);
@@ -2765,8 +2972,16 @@ function makePowerProblem(max, mastered) {
       updateHomeStats();
       return;
     }
+    if (input.name === "rangeLocked") {
+      appSettings.rangeLocked = input.checked; saveSettings(); renderSettingsContent(); return;
+    }
+    if (input.name === "topic") {
+      handleSettingsChange({target:{name:'manualStage',value:input.value}}); return;
+    }
     if (input.name === "range") {
+      appSettings.rangeLocked = true;
       appSettings.range = input.value;
+      settingsNotice = language === 'ru' ? 'Жёсткая граница включена. Показаны только совместимые темы.' : 'Feste Grenze aktiviert. Es werden nur passende Themen angezeigt.';
       const profile = getProfile();
       if (appSettings.automatic) setAdaptiveStage(profile, Math.min(profile.currentStage, maximumAllowedStage()));
       else {
@@ -2780,10 +2995,12 @@ function makePowerProblem(max, mastered) {
     }
     if (input.name === "manualStage") {
       const previousStage = appSettings.manualStage;
-      appSettings.manualStage = Math.min(CURRICULUM_STAGE_COUNT, Math.max(1, Number(input.value) || 1));
+      appSettings.manualStage = Math.min(appSettings.rangeLocked ? maximumAllowedStage() : CURRICULUM_STAGE_COUNT, Math.max(1, Number(input.value) || 1));
       if (!appSettings.automatic) {
-        appSettings.range = rangeForStage(appSettings.manualStage);
+        if (!appSettings.rangeLocked) appSettings.range = rangeForStage(appSettings.manualStage);
+        settingsNotice = `${language === "ru" ? "Тема выбрана. Диапазон:" : "Thema gewählt. Zahlenraum:"} ${copy.rangeNames[appSettings.range]}`;
         appSettings.operations = availableOperationsThroughStage(appSettings.manualStage);
+        if (!appSettings.operations.length) appSettings.operations = ["add"];
       }
       if (appSettings.manualStage !== previousStage || appSettings.automatic) {
         const profile = getProfile();
@@ -2805,6 +3022,7 @@ function makePowerProblem(max, mastered) {
       const selected = [...$("settingsContent").querySelectorAll('input[name="operation"]:checked')].map((item) => item.value);
       if (!selected.length) {
         input.checked = true;
+        $("settingsNotice").textContent = language === "ru" ? "Оставь хотя бы одно действие." : "Bitte mindestens eine Rechenart auswählen.";
         return;
       }
       appSettings.operations = OPERATION_ORDER.filter((operation) => selected.includes(operation));
@@ -3017,164 +3235,6 @@ function makePowerProblem(max, mastered) {
     window.__kapiDemo = { play, reset, getOutfit: () => demoMotivation.getOutfit() };
   }
 
-
-  function setupResultPreview() {
-    document.body.classList.add("result-preview");
-    const style = document.createElement("style");
-    style.textContent = `
-      body.result-preview:not(.preview-playing) .app-shell { visibility: hidden; }
-      .preview-dialog { width: min(440px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 24px; border: 0; border-radius: 24px; background: #fffdf4; color: #17312f; }
-      .preview-dialog::backdrop { background: #e8f5f0; }
-      .preview-dialog h1 { margin: 8px 0 12px; font-size: 1.65rem; line-height: 1.2; }
-      .preview-dialog p { line-height: 1.5; }
-      .preview-dialog label { display: block; margin: 16px 0; font-weight: 700; }
-      .preview-dialog select { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 8px; font: inherit; background: white; border: 1px solid #779d94; border-radius: 10px; }
-      .preview-dialog .preview-sound { display: flex; align-items: center; gap: 10px; min-height: 44px; }
-      .preview-dialog input { width: 22px; height: 22px; }
-      .preview-dialog button { width: 100%; min-height: 48px; }
-      .preview-dialog [role=status] { font-size: .9rem; }
-    `;
-    document.head.appendChild(style);
-    const dialog = document.createElement("dialog");
-    dialog.className = "preview-dialog";
-    dialog.setAttribute("aria-labelledby", "previewTitle");
-    dialog.innerHTML = `<span class="eyebrow">KAPI · DEMO</span>
-      <h1 id="previewTitle">Финал тренировки</h1><small id="previewBuild">DEMO 24 · 24 ТОЧКИ</small>
-      <p id="previewHelp">Танец → новая остановка → снаряжение → результаты. 24 точки и 5 новых глав. Выберите остановку для проверки. Без решения заданий. Учебный прогресс не меняется.</p>
-      <label id="previewLanguageLabel">Язык / Sprache
-        <select id="previewLanguage"><option value="ru">Русский</option><option value="de">Deutsch</option></select></label>
-      <label><span id="previewScenarioLabel">Сценарий</span>
-        <select id="previewScenario">
-          <option value="gift">С новым подарком</option>
-          <option value="scarf">Новый шарф</option><option value="backpack">Новый рюкзак</option><option value="perfect">Без ошибок</option>
-          <option value="regular">Обычное завершение</option>
-        </select></label>
-      <label><span id="previewDestinationLabel">Остановка прибытия</span><select id="previewDestination"><option value="auto">По порядку / Der Reihe nach</option></select></label>
-      <label class="preview-sound"><input id="previewMotion" type="checkbox" checked><span id="previewMotionLabel">Полная анимация</span></label>
-      <label class="preview-sound"><input id="previewSound" type="checkbox" checked><span id="previewSoundLabel">Со звуком</span></label>
-      <button id="previewPlay" class="primary-button" type="button">▶ Смотреть</button>
-      <button id="previewReset" class="text-button" type="button">Начать маршрут заново / Neu starten</button><p id="previewStatus" role="status" aria-live="polite"></p>`;
-    document.body.appendChild(dialog);
-    $("previewReset").onclick = () => { previewMemory.clear(); $("previewStatus").textContent = "0 / 23"; };
-    const languageInput = $("previewLanguage");
-    const scenarioInput = $("previewScenario");
-    const playButton = $("previewPlay");
-    let playing = false;
-    const labels = () => {
-      const ru = languageInput.value === "ru";
-      $("previewTitle").textContent = ru ? "Финал тренировки" : "Trainingsabschluss";
-      $("previewHelp").textContent = ru
-        ? "Танец → новая остановка → снаряжение → результаты. 24 точки и 5 новых глав. Выберите остановку для проверки. Без решения заданий. Учебный прогресс не меняется."
-        : "Tanz → Ankunft → Ausrüstung → Ergebnis. 24 Orte und 5 neue Kapitel. Ankunftsort zum Testen wählen. Ohne Aufgaben. Ihr Lernfortschritt bleibt unverändert.";
-      const previousDestination = $("previewDestination").value;
-      $("previewDestinationLabel").textContent = ru ? "Остановка прибытия" : "Ankunftsort";
-      $("previewDestination").innerHTML = `<option value="auto">${ru ? 'По порядку' : 'Der Reihe nach'}</option>` + window.KapiJourney.copy[ru ? 'ru' : 'de'].places.slice(1).map((place,i) => `<option value="${i+1}">${i+2}. ${place}</option>`).join('');
-      $("previewDestination").value = previousDestination || 'auto';
-      $("previewScenarioLabel").textContent = ru ? "Сценарий" : "Variante";
-      [...scenarioInput.options].forEach((option, index) => {
-        option.textContent = (ru ? ["Новый значок", "Новый шарф", "Новый рюкзак", "Без ошибок", "Обычное завершение"]
-          : ["Neues Abzeichen", "Neues Tuch", "Neuer Rucksack", "Fehlerfreie Runde", "Normaler Abschluss"])[index];
-      });
-      $("previewMotionLabel").textContent = ru ? "Полная анимация" : "Volle Animation";
-      $("previewSoundLabel").textContent = ru ? "Со звуком" : "Mit Ton";
-      playButton.textContent = ru ? "▶ Смотреть" : "▶ Abspielen";
-    };
-    languageInput.addEventListener("change", labels);
-    const openControls = () => {
-      endResultShow();
-      if (!dialog.open) dialog.showModal();
-    };
-    const play = async () => {
-      if (playing) return;
-      playing = true;
-      playButton.disabled = true;
-      const ru = languageInput.value === "ru";
-      $("previewStatus").textContent = ru ? "Загружаем Капи…" : "Kapi wird geladen…";
-      // Unlock on the user's tap, before awaiting image downloads.
-      soundManager.unlock();
-      try {
-        await Promise.race([
-          Promise.all([...kapi.animator.images.values()].map((entry) => entry.promise)),
-          new Promise((_, reject) => window.setTimeout(() => reject(new Error("Asset timeout")), 15000))
-        ]);
-        endResultShow();
-        previewFullMotion = $("previewMotion").checked;
-        kapi.animator.reducedMotion = !previewFullMotion;
-        document.body.classList.toggle("preview-full-motion", previewFullMotion);
-        motivation.resetSession();
-        // Keep the isolated demo journey between previews.
-        const priorProfile = getProfile();
-        previewMemory.clear();
-        storage.setItem(SETTINGS_KEY, JSON.stringify({
-          ...appSettings, language: languageInput.value, sound: $("previewSound").checked
-        }));
-        loadSettings();
-        applyLanguage();
-        const profile = getProfile();
-        profile.journey = priorProfile.journey;
-        if ($("previewDestination").value !== "auto") profile.journey = {step: Number($("previewDestination").value) - 1, sessions: []};
-        profile.cosmeticVariants = priorProfile.cosmeticVariants;
-        profile.unlockedRewards = priorProfile.unlockedRewards;
-        profile.equippedOutfit = priorProfile.equippedOutfit;
-        profile.totalXp = Math.max(priorProfile.totalXp, scenarioInput.value === "scarf" ? 130 : scenarioInput.value === "backpack" ? 190 : scenarioInput.value === "gift" ? 15 : 100);
-        profile.currentStage = 1;
-        saveProfile(profile);
-        const perfect = scenarioInput.value === "perfect";
-        TOTAL = 20;
-        Object.assign(state, {
-          index: TOTAL, score: perfect ? 30 : 25, correct: perfect ? TOTAL : 18,
-          stage: 1, trainingStartStage: 1, trainingStartedCompleted: false,
-          stageAdvancedDuringSession: false, finalMotivationEvents: [],
-          sessionId: "preview-" + Date.now(), finished: false, targeted: null,
-          results: Array.from({ length: TOTAL }, (_, index) => ({
-            firstTry: perfect || index < 18, seconds: 4, taskType: "equation", key: "preview-" + index
-          }))
-        });
-        $("correctLabel").textContent = copy.correctOfTotal(TOTAL);
-        document.body.classList.add("preview-playing");
-        dialog.close();
-        finishTraining(); // The real beta finale, including its sounds and timers.
-        // endResultShow() can create this canvas while its section is hidden (1x1).
-        // Restart only after the dialog is closed and the result layout is visible.
-        const restartCanvas = () => {
-          if (!$("resultScreen").classList.contains("active")) return;
-          kapi.animator.pause("result");
-          kapi.animator.setSurface("result");
-        };
-        restartCanvas();
-        window.requestAnimationFrame(restartCanvas);
-        $("againButton").textContent = ru ? "Посмотреть ещё раз" : "Noch einmal ansehen";
-        $("settingsButton").textContent = "☰";
-        $("settingsButton").setAttribute("aria-label", ru ? "Настройки просмотра" : "Vorschau einstellen");
-        $("previewStatus").textContent = "";
-      } catch (error) {
-        console.error("Kapi result preview:", error);
-        if (!dialog.open) dialog.showModal();
-        $("previewStatus").textContent = ru
-          ? "Не удалось загрузить Капи. Проверьте интернет и попробуйте ещё раз."
-          : "Kapi konnte nicht geladen werden. Bitte Verbindung prüfen und erneut versuchen.";
-      } finally {
-        playing = false;
-        playButton.disabled = false;
-      }
-    };
-    playButton.addEventListener("click", play);
-    document.addEventListener("click", (event) => {
-      const button = event.target.closest?.("button");
-      if (!button) return;
-      if (button.id === "againButton") {
-        event.preventDefault(); event.stopImmediatePropagation(); play();
-      } else if (["settingsButton", "homeButton"].includes(button.id)) {
-        event.preventDefault(); event.stopImmediatePropagation(); openControls();
-      }
-    }, true);
-    dialog.addEventListener("cancel", (event) => {
-      if (!document.body.classList.contains("preview-playing")) event.preventDefault();
-    });
-    labels();
-    dialog.showModal();
-  }
-
   document.addEventListener("click", () => {
     if ($("resultScreen").classList.contains("active")) soundManager?.stopChannel("music");
   }, true);
@@ -3184,14 +3244,43 @@ function makePowerProblem(max, mastered) {
   document.addEventListener("keydown", () => {
     if ($("resultScreen").classList.contains("active")) soundManager?.stopChannel("music");
   }, true);
+  $("journeyAlbumButton").addEventListener("click", openJourneyAlbum);
+  $("journeyPicker").addEventListener("close", () => updateMascotOutfit());
+  $("continueArrival").addEventListener("click", () => {
+    const next = continueArrival;
+    continueArrival = null;
+    if (!next) return;
+    next();
+    if ($("resultScreen").dataset.showPhase === "summary") $("againButton").focus();
+    else $("skipResultShow").focus();
+  });
+  $("skipResultShow").addEventListener("click", () => { endResultShow(); $("againButton").focus(); });
   $("startButton").addEventListener("click", () => startTrainingWithIntro());
+  $("resultScreen").addEventListener('click', event => {
+    const button = event.target.closest('[data-equip-now]'); if (!button) return;
+    const profile = getProfile(); rewards.equip(profile, button.dataset.equipNow); saveProfile(profile); updateMascotOutfit(profile);
+    button.textContent = language === 'ru' ? 'Надето' : 'Angezogen'; button.disabled = true;
+  });
   $("homeMascot").addEventListener("click", playHomeReaction);
   document.querySelector(".app-shell").addEventListener("pointerdown", (event) => {
     if (kapi?.surface === "home" && !kapi.state.startsWith("idle") && !event.target.closest("#homeMascot")) clearHomeReaction();
   });
+  $("resultRepeatButton").addEventListener('click', () => {
+    const problem = state.results.find(item => !item.firstTry && item.problem)?.problem;
+    if (problem) practiceHistoryProblem(problem);
+  });
+  $("resultNewButton").addEventListener('click', () => startTrainingWithIntro());
+  $("mapChapters").addEventListener('click', event => {
+    const button = event.target.closest('[data-map-practice]');
+    if (!button) return;
+    const stage = Number(button.dataset.mapPractice), profile = getProfile();
+    if (stage > Math.max(profile.currentStage, appSettings.automatic ? 0 : appSettings.manualStage)) return;
+    $("mapDialog").close();
+    if (stage === (appSettings.automatic ? profile.currentStage : appSettings.manualStage)) startTrainingWithIntro();
+    else startTraining({}, {profile, targeted:{skillId:skills.KAPI_SKILLS.find(s=>s.stage===stage).id,historyPractice:true,taskType:'equation'}, trainingStage:stage});
+  });
   $("againButton").addEventListener("click", () => { showScreen($("startScreen")); updateHomeStats(); });
   $("shareButton").addEventListener("click", shareResult);
-  $("statsButton").addEventListener("click", showStats);
   $("wardrobeButton").addEventListener("click", showWardrobe);
   $("mapButton").addEventListener("click", showCurriculumMap);
   $("closeMapButton").addEventListener("click", () => $("mapDialog").close());
@@ -3202,17 +3291,43 @@ function makePowerProblem(max, mastered) {
     const unequip = event.target.closest("[data-unequip]");
     if (!equip && !unequip) return;
     const profile = getProfile();
-    if (equip ? !rewards.equip(profile, equip.dataset.equip) : !rewards.unequip(profile, unequip.dataset.unequip)) return;
+    const selected = equip?.getAttribute("aria-pressed") === "true";
+    const slot = equip && rewards.getRewards().find(reward => reward.id === equip.dataset.equip)?.slot;
+    if (equip ? !(selected ? rewards.unequip(profile, slot) : rewards.equip(profile, equip.dataset.equip)) : !rewards.unequip(profile, unequip.dataset.unequip)) return;
+    if (equip?.dataset.variant && window.KapiJourney.variants[equip.dataset.equip]?.some(option => option.id === equip.dataset.variant)) {
+      profile.cosmeticVariants[equip.dataset.equip] = equip.dataset.variant;
+    }
     saveProfile(profile);
     updateMascotOutfit(profile);
     renderWardrobe();
-    renderJourneyWardrobe();
+    const replacement = [...$("wardrobeItems").querySelectorAll("button")].find(button => equip
+      ? button.dataset.equip === equip.dataset.equip && button.dataset.variant === equip.dataset.variant
+      : button.dataset.unequip === unequip.dataset.unequip);
+    replacement?.focus({ preventScroll: true });
+
   });
-  $("journeyAlbumButton").addEventListener("click", openJourneyAlbum);
-  $("journeyPicker").addEventListener("close", () => updateMascotOutfit());
-  $("skipResultShow").addEventListener("click", () => { endResultShow(); $("againButton").focus(); });
+  document.addEventListener("keydown", event => {
+    if (!$("gameScreen").classList.contains("active") || state.locked || state.problem?.mode === "choice" || document.querySelector('dialog[open]') || event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
+    if (event.target?.isContentEditable || ['INPUT','TEXTAREA','SELECT'].includes(event.target?.tagName)) return;
+    let key = event.key;
+    if (event.code === 'NumpadDecimal') key = ',';
+    if (key === '.') key = ',';
+    const action = key === 'Enter' ? 'submit' : key === 'Backspace' ? 'backspace' : key === 'Delete' ? 'clear' : null;
+    if (!action && !/^[0-9,\-/]$/.test(key)) return;
+    event.preventDefault();
+    const dataset = action ? { action } : { key };
+    handleKeypadClick({ target: { closest: () => ({ dataset }) } });
+  });
+
   $("resultStatsButton").addEventListener("click", showStats);
   $("statsContent").addEventListener("click", (event) => {
+    const repeat = event.target.closest("[data-history-repeat]");
+    if (repeat) {
+      const [sessionIndex, index] = repeat.dataset.historyRepeat.split(':').map(Number);
+      const p = getHistory()[sessionIndex]?.mistakes?.[index]?.problem;
+      practiceHistoryProblem(p);
+      return;
+    }
     const button = event.target.closest("[data-target-subskill]");
     if (!button) return;
     const profile = getProfile();
@@ -3221,7 +3336,7 @@ function makePowerProblem(max, mastered) {
     if (!skill || skill.stage > targetLimit ||
       (!appSettings.automatic && !appSettings.operations.includes(skills.getSubskill(button.dataset.targetSubskill)?.operation)) ||
       !subskills.availableSubskills(skill.id, profile).includes(button.dataset.targetSubskill)) return;
-    $("statsDialog").close();
+    $("statsDialog").close(); $("settingsDialog").close();
     startTrainingWithIntro({ targetSkillId: skill.id, targetSubskillId: button.dataset.targetSubskill });
   });
   $("closeStatsButton").addEventListener("click", () => $("statsDialog").close());
@@ -3251,6 +3366,10 @@ function makePowerProblem(max, mastered) {
   $("settingsContent").addEventListener("change", handleSettingsChange);
   $("settingsContent").addEventListener("click", (event) => {
     const sectionButton = event.target.closest("[data-settings-section]");
+    if (sectionButton?.dataset.settingsSection === "history") {
+      showStats();
+      return;
+    }
     if (sectionButton) {
       settingsSection = sectionButton.dataset.settingsSection;
       renderSettingsContent();
@@ -3300,10 +3419,10 @@ function makePowerProblem(max, mastered) {
   if (runsStandalone()) storage.setItem(INSTALLED_KEY, "1");
   updateInstallHomeButton();
   document.body.classList.add("start-active");
-  if (!resultPreview && isIosBrowser() && !runsStandalone()) showInstallPrompt("ios");
-  if (!resultPreview) registerWebMcp();
+  if (isIosBrowser() && !runsStandalone()) showInstallPrompt("ios");
+  registerWebMcp();
   syncViewportSize();
-  if (!resultPreview && !window.__kapiDemo) window.setTimeout(() => {
+  if (!window.__kapiDemo) window.setTimeout(() => {
     if ($("startScreen").classList.contains("active")) restartHomeGreeting();
   }, 360);
   window.addEventListener("resize", syncViewportSize, { passive: true });
@@ -3312,6 +3431,5 @@ function makePowerProblem(max, mastered) {
   });
   window.visualViewport?.addEventListener("resize", syncViewportSize, { passive: true });
   window.visualViewport?.addEventListener("scroll", syncViewportSize, { passive: true });
-  if (resultPreview) setupResultPreview();
-  else registerServiceWorker();
+  registerServiceWorker();
 })();
