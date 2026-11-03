@@ -302,3 +302,17 @@ offline, backup and multi-tab checks; PASS. No physical phone tested.
 Published beta PR#1, merge981e20a; workflow41702230304 SUCCESS. Public HTTPS
 index.html, styles.css, app.js and beta-dynamic-mascot-v104 worker matched the
 reviewed files byte-for-byte. Production was not published.
+
+## Parent skill report — 2026-11-03
+
+Local RU/DE parent report, observations and versioned backup; see
+`docs/PARENT_REPORT.md` for thresholds, data retention and compatibility.
+Includes the earlier requested About credit and removal of the duplicate home
+link. Production remains unchanged by this beta release.
+
+Verified: nine model tests, journey regression, parent-report browser scenarios
+in RU/DE at 320/390 px, live cross-tab updates, invalid fraction input, exactly
+once recording, retention, old/new backups and storage failure. PWA update from
+the previous beta, offline startup and backup checks passed at root and /kapi/.
+Mobile report screenshots inspected under /workspace/artifacts/parent-report;
+320 px requires normal vertical scrolling. No physical phone was tested.

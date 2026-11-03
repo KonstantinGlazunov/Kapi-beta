@@ -1,0 +1,10 @@
+{
+  "name": "kapi",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "test:parent": "node tests/parent-report-e2e.cjs",
+    "test:pwa": "node tests/pwa-e2e.cjs"
+  },
+  "devDependencies": { "playwright": "1.62.0" }
+}

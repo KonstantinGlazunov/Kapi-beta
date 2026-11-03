@@ -18,8 +18,35 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Model and data validation
+        run: npm test
       - name: Journey persistence and backup checks
         run: node tests/journey.cjs
+      - name: Parent report in the browser
+        run: npm run test:parent
+        env:
+          KAPI_E2E_SCREENSHOTS: artifacts/parent-report
+      - name: Prepare previous beta version
+        run: |
+          mkdir -p "$RUNNER_TEMP/kapi-previous"
+          git archive HEAD^:site | tar -x -C "$RUNNER_TEMP/kapi-previous"
+      - name: Installed-app update and backup
+        run: npm run test:pwa
+        env:
+          KAPI_PREVIOUS_SITE: ${{ runner.temp }}/kapi-previous
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: parent-report-mobile
+          path: artifacts/parent-report
       - uses: actions/configure-pages@v5
         with:
           enablement: true
