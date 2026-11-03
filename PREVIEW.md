@@ -298,3 +298,7 @@ keypad,landscape}.png. Fit9/10, visual9/10, design9/10: Kapi fills unused
 space without clipping, equation and controls remain clear. Safe worker update
 from the prior beta worker tested on root and /kapi/ with stored profile,
 offline, backup and multi-tab checks; PASS. No physical phone tested.
+
+Published beta PR#1, merge981e20a; workflow41702230304 SUCCESS. Public HTTPS
+index.html, styles.css, app.js and beta-dynamic-mascot-v104 worker matched the
+reviewed files byte-for-byte. Production was not published.
