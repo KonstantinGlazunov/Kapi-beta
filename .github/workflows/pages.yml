@@ -30,6 +30,12 @@ jobs:
         run: npm test
       - name: Journey persistence and backup checks
         run: node tests/journey.cjs
+      - name: Start app for navigation checks
+        run: python3 -m http.server 8792 --bind 127.0.0.1 --directory site > /tmp/kapi-beta-http.log 2>&1 &
+      - name: Unified navigation in the browser
+        run: npm run test:navigation
+        env:
+          KAPI_E2E_SCREENSHOTS: artifacts/navigation
       - name: Parent report in the browser
         run: npm run test:parent
         env:
@@ -46,7 +52,7 @@ jobs:
         if: always()
         with:
           name: parent-report-mobile
-          path: artifacts/parent-report
+          path: artifacts/
       - uses: actions/configure-pages@v5
         with:
           enablement: true

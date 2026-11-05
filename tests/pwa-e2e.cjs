@@ -182,7 +182,7 @@ async function run() {
       await context.setOffline(false);
       // Export/import UI: cancellation and malformed files cannot replace progress.
       await offline.locator('#settingsButton').click();
-      await offline.locator('[data-settings-section=history]').click();
+      await offline.locator('[data-settings-section=general]').click();await offline.locator('[data-fold=backup] > summary').click();
       const downloadPromise = offline.waitForEvent('download');
       await offline.locator('[data-backup-export]').click();
       const download = await downloadPromise;
@@ -210,22 +210,20 @@ async function run() {
       offline.off('dialog', onUnexpectedDialog);
       assert.equal(unexpectedConfirm, 0, 'invalid task must be rejected before asking to replace data');
       assert.deepEqual(await offline.evaluate(() => ['capy-count-data-v1', 'capy-count-profile-v1', 'capy-count-settings-v1', 'capy-count-history-v1'].map(key => localStorage.getItem(key))), rawBefore);
-      await offline.locator('#closeStatsButton').click();
       await offline.locator('#closeSettingsButton').click();
       await offline.locator('#startButton').click();if (await offline.locator('#journeyExplanation').isVisible()) await offline.locator('#journeyExplanationStart').click();
       await offline.locator('#gameScreen').waitFor({state:'visible'});
       assert.equal(await offline.locator('#gameScreen').isVisible(), true, 'training still starts after rejected import');
       await offline.locator('#homeButton').click();
       await offline.locator('#settingsButton').click();
-      await offline.locator('[data-settings-section=history]').click();
+      await offline.locator('[data-settings-section=general]').click();await offline.locator('[data-fold=backup] > summary').click();
       await offline.locator('[data-backup-import]').setInputFiles({ name: 'bad.json', mimeType: 'application/json', buffer: Buffer.from('{broken') });
       await offline.waitForFunction(() => document.querySelector('#backupStatus').textContent.includes('beschädigt'));
       assert.equal(await offline.locator('#totalXpValue').innerText(), '333');
       const screenshotDir = process.env.KAPI_E2E_SCREENSHOTS;
       if (screenshotDir) {
         await mkdir(screenshotDir, { recursive: true });
-        await offline.locator('#closeStatsButton').click();
-        await offline.locator('[data-settings-section=general]').click();
+        await offline.locator('[data-fold=backup] > summary').click();
         for (const lang of ['de', 'ru']) {
           await offline.locator(`input[name=language][value=${lang}]`).check();
           for (const width of [320, 390]) {
@@ -235,7 +233,7 @@ async function run() {
         }
         await offline.locator('#closeSettingsButton').click();
         await offline.locator('#settingsButton').click();
-        await offline.locator('[data-settings-section=about]').click();
+        await offline.locator('[data-settings-section=general]').click();await offline.locator('[data-fold=about] > summary').click();
         await offline.screenshot({ path: path.join(screenshotDir, `parents-${prefix === '/' ? 'root' : 'kapi'}-ru.png`) });
       }
       assert.deepEqual(errors, []);
