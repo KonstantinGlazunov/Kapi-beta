@@ -331,3 +331,21 @@ history and range controls in Chromium mobile emulation. Screenshots reviewed at
 /workspace/artifacts/history-settings (320 and 390 px); no physical phone tested.
 Fit 9/10, visual 9/10, design 9/10: three readable actions, familiar controls,
 normal scrolling for longer history.
+
+## Unified navigation — 2026-11-05
+
+Beta branch `beta/unified-navigation` reorganizes settings into Activity, Child
+progress and App; the report contains the weekly goal, all topics and history.
+The same chapter/skill selector serves Activity and All topics. The home mascot
+opens its wardrobe, Journey opens the existing album, and the nearest stop has
+one explanation. Stored progress, backup format, task generation, rewards,
+lesson length, answer handling and mascot animation remain unchanged. See the
+separate parent-report documentation for the evidence model.
+
+Validated RU/DE mobile browser navigation at 320x568, 390x844, 740x844 and
+740x390; keyboard and browser Back; album/viewer; preserved manual settings,
+table-specific practice, in-session report, result-to-history, deletion
+confirmation, weekly target and backups. Model, journey, parent-report and PWA
+update/offline tests passed locally. Screenshots reviewed in
+/workspace/artifacts/beta-nav: fit 9/10, visual 9/10, design 9/10; long content
+scrolls normally. Tests are emulation, not a physical phone.
