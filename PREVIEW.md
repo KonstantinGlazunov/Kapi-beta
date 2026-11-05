@@ -316,3 +316,18 @@ once recording, retention, old/new backups and storage failure. PWA update from
 the previous beta, offline startup and backup checks passed at root and /kapi/.
 Mobile report screenshots inspected under /workspace/artifacts/parent-report;
 320 px requires normal vertical scrolling. No physical phone was tested.
+
+## History and range settings — 2026-11-05
+
+The selected maximum range is the fixed limit; the redundant lock control was
+removed. Backup export/import now live with history deletion in the history
+screen. Backup still contains profile, settings, history and parent report;
+deleting history remains a separate confirmed operation. Music credit remains
+in About, removed from the separate result preview. Worker: beta-history-settings-v1.
+
+Verified model and journey tests, parent-report browser and backup checks,
+PWA update from the previous beta at root and /kapi/, and Russian/German
+history and range controls in Chromium mobile emulation. Screenshots reviewed at
+/workspace/artifacts/history-settings (320 and 390 px); no physical phone tested.
+Fit 9/10, visual 9/10, design 9/10: three readable actions, familiar controls,
+normal scrolling for longer history.

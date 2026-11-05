@@ -1844,3 +1844,9 @@ body.game-active .play-card #answerArea { margin-top: 8px; }
 .parent-subtopic { border-left: 3px solid #8bc8b7; padding: 8px 10px; background: #f4faf6; border-radius: 8px; }
 .parent-subtopic summary { font-size: .94rem; }
 .parent-subtopic .parent-details { font-size: .9rem; }
+
+.history-data { border-top: 1px solid #d9e6e1; margin-top: 24px; padding-top: 16px; }
+.history-data-actions { display: grid; gap: 10px; }
+.history-data-actions .setting-toggle, .history-data-actions .danger-text-button { min-height: 44px; width: 100%; }
+.history-data-actions .danger-text-button { margin: 0; }
+.history-data-actions .danger-text-button:disabled { opacity: .5; }

@@ -370,6 +370,10 @@
     $("historyTitle").textContent = copy.history;
     $("closeStatsButton").setAttribute("aria-label", copy.close);
     $("clearStatsButton").textContent = copy.clearHistory;
+    $("historyData").setAttribute("aria-label", language === "ru" ? "Данные и перенос" : "Daten und Übertragung");
+    $("historyBackupHelp").textContent = copy.backupHelp;
+    $("historyBackupExport").textContent = language === "ru" ? "Сохранить историю" : "Verlauf sichern";
+    $("historyBackupImportLabel").textContent = language === "ru" ? "Восстановить историю" : "Verlauf wiederherstellen";
     $("settingsTitle").textContent = copy.settings;
     $("settingsHint").textContent = copy.settingsHint;
     if (storage.failed) $("storageNotice").textContent = copy.storageWarning;
@@ -396,7 +400,7 @@
       appSettings.problemCount = [10, 20, 30].includes(Number(value.problemCount)) ? Number(value.problemCount) : 10;
       const currentCurriculum = value.curriculumVersion === CURRICULUM_VERSION;
       appSettings.automatic = value.automatic !== false;
-      appSettings.rangeLocked = value.rangeLocked === true;
+      appSettings.rangeLocked = true;
       appSettings.range = ["10", "20", "100", "above100"].includes(String(value.range)) ? String(value.range) : "above100";
       appSettings.operations = Array.isArray(value.operations)
         ? OPERATION_ORDER.filter((operation) => value.operations.includes(operation))
@@ -443,7 +447,6 @@
     const items = [
       ["counting", "±", copy.settingsCounting, copy.settingsCountingMenu],
       ["general", "A", copy.settingsGeneral, copy.settingsGeneralMenu],
-      ["data", "⇄", language === "ru" ? "Данные и перенос" : "Daten und Umzug", copy.backupHelp],
       ["parents", "♡", language === "ru" ? "Для родителей" : "Für Eltern", language === "ru" ? "Успехи ребёнка" : "Lernfortschritt des Kindes"],
       ["history", "◷", copy.homeHistory, language === "ru" ? "Результаты прошлых тренировок" : "Ergebnisse vergangener Trainings"],
       ["about", "i", copy.settingsAbout, copy.settingsAboutMenu]
@@ -480,16 +483,6 @@
         </section>`;
       return;
     }
-    if (settingsSection === "data") {
-      content.innerHTML = `${navigation}<section class="settings-panel">          <fieldset class="backup-controls"><legend>${copy.backupTitle}</legend>
-            <p class="settings-note">${copy.backupHelp}</p>
-            <button class="setting-toggle" type="button" data-backup-export>${copy.backupExport}</button>
-            <label class="backup-file">${copy.backupImport}<input type="file" data-backup-import accept="application/json,.json"></label>
-            <p id="backupStatus" role="status"></p>
-          </fieldset>
-</section>`;
-      return;
-    }
     if (settingsSection === "about") {
       content.innerHTML = `${navigation}
         <section class="settings-panel about-panel">
@@ -518,12 +511,12 @@
       </fieldset>
       ${appSettings.automatic ? `<p class="settings-note">${copy.automaticHint}</p>` : `<label class="topic-picker">${ru ? 'Тема' : 'Thema'}<select name="topic">${chapters.map(c => `<option value="${c.first}" ${c.id === chosenChapter?.id ? 'selected' : ''}>${c[language]}${!appSettings.rangeLocked && rangeForStage(c.first) !== appSettings.range ? " — " + (ru ? "диапазон изменится на " : "Zahlenraum wechselt zu ") + copy.rangeNames[rangeForStage(c.first)] : ""}</option>`).join('')}</select></label>
         <p class="topic-example"><strong>${copy.stageNames[selectedStage-1]}</strong><br>${STAGE_EXAMPLES[selectedStage-1]}</p>
-        <p class="settings-note">${rangeHint} ${copy.rangeNames[rangeForStage(selectedStage)]}. ${ru ? 'Выбор другой темы может изменить диапазон. Жёсткую границу можно задать ниже.' : 'Ein anderes Thema kann den Zahlenraum ändern. Eine feste Grenze lässt sich unten setzen.'}</p>`}
+        <p class="settings-note">${rangeHint} ${copy.rangeNames[rangeForStage(selectedStage)]}. ${ru ? 'Доступны темы в пределах выбранного диапазона.' : 'Es stehen Themen innerhalb des gewählten Zahlenraums zur Verfügung.'}</p>`}
       <p id="settingsNotice" role="status">${settingsNotice}</p>
       <details class="settings-advanced" ${advancedSettingsOpen ? 'open' : ''}><summary>${ru ? 'Дополнительные параметры' : 'Weitere Einstellungen'}</summary>
         <fieldset><legend>${copy.examples}</legend>${[10,20,30].map(n=>`<label><input type="radio" name="problemCount" value="${n}" ${appSettings.problemCount===n?'checked':''}>${n}</label>`).join('')}</fieldset>
         <fieldset><legend>${copy.range}</legend>${['10','20','100','above100'].map(value=>`<label><input type="radio" name="range" value="${value}" ${appSettings.range===value?'checked':''}>${copy.rangeNames[value]}</label>`).join('')}
-        <label class="setting-wide"><input type="checkbox" name="rangeLocked" ${appSettings.rangeLocked?'checked':''}>${ru?'Не выходить за выбранный диапазон':'Diesen Zahlenraum nicht überschreiten'}</label></fieldset>
+        </fieldset>
         <fieldset class="stage-settings"><legend>${copy.chooseStage}</legend><select name="manualStage" aria-label="${copy.chooseStage}">${Array.from({length:limit},(_,i)=>`<option value="${i+1}" ${selectedStage===i+1?'selected':''}>${i+1}. ${copy.stageNames[i]}${!appSettings.rangeLocked&&rangeForStage(i+1)!==appSettings.range?' — '+copy.rangeNames[rangeForStage(i+1)]:''}</option>`).join('')}</select>
         <p>${STAGE_EXAMPLES[selectedStage-1]}</p></fieldset>
         <fieldset class="operation-settings"><legend>${copy.operations}</legend><p class="settings-note">${ru?'Действия доступны для выбранной темы. Должно остаться хотя бы одно.':'Rechenarten hängen vom Thema ab. Mindestens eine muss ausgewählt bleiben.'}</p>${OPERATION_ORDER.map(operation=>{const available=operationAvailableAtStage(operation,selectedStage);return `<label><input type="checkbox" name="operation" value="${operation}" ${appSettings.automatic?available?'checked':'':appSettings.operations.includes(operation)?'checked':''} ${appSettings.automatic||!available?'disabled':''}>${copy.operationNames[operation]}</label>`}).join('')}</fieldset>
@@ -2725,7 +2718,7 @@ function makePowerProblem(max, mastered) {
   function showStats() {
     const history = getHistory();
     const content = $("statsContent");
-    $("clearStatsButton").classList.toggle("hidden", history.length === 0);
+    $("clearStatsButton").disabled = history.length === 0;
     if (!history.length) {
       content.innerHTML = `<div class="empty-state">${copy.emptyHistory}</div>`;
     } else {
@@ -2781,7 +2774,7 @@ function makePowerProblem(max, mastered) {
         }).join("")}</div>
         ${hasTrouble ? "" : `<p class="trouble-note no-errors"><strong>${copy.noErrors}</strong></p>`}`;
     }
-    $("statsDialog").showModal();
+    if (!$('statsDialog').open) $("statsDialog").showModal();
   }
 
   function escapeHistory(value) {
@@ -3096,16 +3089,13 @@ function makePowerProblem(max, mastered) {
       updateHomeStats();
       return;
     }
-    if (input.name === "rangeLocked") {
-      appSettings.rangeLocked = input.checked; saveSettings(); renderSettingsContent(); return;
-    }
     if (input.name === "topic") {
       handleSettingsChange({target:{name:'manualStage',value:input.value}}); return;
     }
     if (input.name === "range") {
       appSettings.rangeLocked = true;
       appSettings.range = input.value;
-      settingsNotice = language === 'ru' ? 'Жёсткая граница включена. Показаны только совместимые темы.' : 'Feste Grenze aktiviert. Es werden nur passende Themen angezeigt.';
+      settingsNotice = language === 'ru' ? 'Показаны темы в пределах выбранного диапазона.' : 'Es werden Themen innerhalb des gewählten Zahlenraums angezeigt.';
       const profile = getProfile();
       if (appSettings.automatic) setAdaptiveStage(profile, Math.min(profile.currentStage, maximumAllowedStage()));
       else {
@@ -3223,7 +3213,7 @@ function makePowerProblem(max, mastered) {
     }
     $("storageNotice").hidden = false;
     if (!storage.failed) $("storageNotice").hidden = true;
-    loadSettings(); applyLanguage(); updateHomeStats();
+    loadSettings(); applyLanguage(); updateHomeStats(); showStats();
     $("backupStatus").textContent = copy.backupDone;
   }
 
@@ -3496,10 +3486,10 @@ function makePowerProblem(max, mastered) {
     if (state.index > 0 && state.index < TOTAL && !window.confirm(copy.leaveConfirm)) return;
     showScreen($("startScreen")); updateHomeStats();
   });
-  $("settingsContent").addEventListener("click", (event) => {
+  $("statsDialog").addEventListener("click", (event) => {
     if (event.target.closest("[data-backup-export]")) exportProgress();
   });
-  $("settingsContent").addEventListener("change", (event) => {
+  $("statsDialog").addEventListener("change", (event) => {
     if (event.target.matches("[data-backup-import]")) {
       importProgress(event.target.files?.[0]); event.target.value = "";
     }
