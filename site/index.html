@@ -122,7 +122,15 @@
       <button class="icon-button" id="closeStatsButton" type="button" aria-label="Закрыть">×</button>
     </div>
     <div id="statsContent"></div>
-    <button class="danger-text-button" id="clearStatsButton" type="button">Удалить историю</button>
+    <section class="history-data" id="historyData" aria-label="Данные и перенос">
+      <p id="historyBackupHelp" class="settings-note"></p>
+      <div class="history-data-actions">
+        <button class="setting-toggle" id="historyBackupExport" type="button" data-backup-export>Сохранить историю</button>
+        <button class="danger-text-button" id="clearStatsButton" type="button">Удалить историю</button>
+        <label class="backup-file"><span id="historyBackupImportLabel">Восстановить историю</span><input type="file" data-backup-import accept="application/json,.json"></label>
+      </div>
+      <p id="backupStatus" role="status"></p>
+    </section>
   </dialog>
 
   <dialog class="wardrobe-dialog" id="wardrobeDialog" aria-labelledby="wardrobeTitle">
